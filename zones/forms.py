@@ -3,7 +3,7 @@ from .models import Zone, Booking
 from django.forms import ModelForm
 
 # Create your forms here.
-class BookingModelFormCreate(ModelForm):
+class ReservationModelFormCreate(ModelForm):
     class Meta:
         model = Booking
         fields = ['resource', 'event_date']
