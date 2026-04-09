@@ -1,0 +1,13 @@
+{% extends "general/layout.html" %}
+
+{% block head_title %}Register{% endblock %}
+
+{% block content %}
+    <h2>Registrarse</h2>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p}}
+        <button>Registrarse</button>
+    </form>
+{% endblock content %}

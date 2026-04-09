@@ -1,0 +1,17 @@
+{% extends "general/layout.html" %}
+
+{% block head_title %}Profile{% endblock %}
+
+{% block content %}
+    <h2>Profile {{ user.first_name }} - Dpto {{ user.resident_profile.department }} </h2>
+
+    <div class="container">
+        <h3>Espacio Común Reservado</h3>
+        <div>
+            <p> Ninguno por ahora </p>
+        </div>
+        <div>
+            <p><a href="">Reserva tu espacio común</a></p>
+        </div>
+    </div>
+{% endblock %}
