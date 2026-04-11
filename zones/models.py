@@ -1,12 +1,13 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Zone(models.Model):
     name = models.CharField(max_length=100, verbose_name='Nombre de la zona')
     description = models.TextField(blank=True)
     capacity = models.PositiveIntegerField(verbose_name='Capacidad máxima')
-    is_available = models.BooleanField(default=True)
+    is_available = models.BooleanField(default=True, verbose_name='Disponible')
 
     class Meta:
         verbose_name = 'Espacio común'
@@ -16,6 +17,7 @@ class Zone(models.Model):
         return self.name
     
 class Booking(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings', null=True, blank=True)
     resource = models.ForeignKey(Zone, on_delete=models.CASCADE, related_name='bookings')
     reservation_date = models.DateTimeField('Fecha de reserva', auto_now_add=True) # -> Sólo fecha
     event_date = models.DateTimeField('Fecha del evento', default=timezone.now) # -> Fecha y hora del evento

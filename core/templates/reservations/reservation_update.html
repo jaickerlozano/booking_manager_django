@@ -1,0 +1,14 @@
+{% extends "general/layout.html" %}
+
+{% block head_title %}Update Booking{% endblock %}
+
+{% block content %}
+    <h2>Actualizar Reserva</h2>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p}}
+        <button>Actualizar Reserva</button>
+        <p><a href="{% url 'reservation_detail' booking.pk %}">Cancelar</a></p>
+    </form>
+{% endblock content %}
