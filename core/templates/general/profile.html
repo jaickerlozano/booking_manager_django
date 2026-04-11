@@ -49,9 +49,10 @@
     <div>
         <h3>Todas las Reservas</h3>
         <div>
-            {% if bookings %}
+            {{ all_bookings.count }} reservas realizadas por los usuarios:
+            {% if all_bookings %}
                 <ul>
-                    {% for booking in bookings %}
+                    {% for booking in all_bookings %}
                         <li>
                             <strong>Departamento:</strong> {{ booking.user.resident_profile.department }} 
                             - <strong>Espacio común reservado:</strong> {{ booking.resource.name }} 

@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.decorators import method_decorator
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.views import LoginView as DjangoLoginView
-from zones.models import Zone
+from zones.models import Zone, Booking
 
 # Create your views here.
 class HomeView(TemplateView):
@@ -72,4 +72,5 @@ class ProfileView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['zones'] = Zone.objects.all()
         context['bookings'] = self.request.user.bookings.all()
+        context['all_bookings'] = Booking.objects.all()
         return context
