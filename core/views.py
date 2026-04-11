@@ -12,6 +12,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from zones.models import Zone, Booking
+from django.db.models import Q
 
 # Create your views here.
 class HomeView(TemplateView):
@@ -70,7 +71,31 @@ class ProfileView(LoginRequiredMixin, TemplateView):
     # Con este método, cada vez que se renderice el profile, se añadirá al contexto la lista de reservas del usuario logueado. Esto es útil para mostrar las reservas en el perfil.
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        # 1. Capturamos el filtro
+        query = self.request.GET.get('dept', '') # Usamos 'dept' como el input principal
+        
+        # 2. Obtenemos el queryset base
+        all_bookings = Booking.objects.all()
+        
+        # 3. Filtramos si hay búsqueda
+        if query:
+            all_bookings = all_bookings.filter(
+                Q(user__resident_profile__department__icontains=query) |
+                Q(resource__name__icontains=query) |
+                Q(user__first_name__icontains=query)
+            )
+
         context['zones'] = Zone.objects.all()
         context['bookings'] = self.request.user.bookings.all()
-        context['all_bookings'] = Booking.objects.all()
+        context['all_bookings'] = all_bookings
+
         return context
+
+    # 4. Sobreescribimos dispatch para manejar la petición AJAX
+    def get(self, request, *args, **kwargs):
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            context = self.get_context_data()
+            # Si es AJAX, solo renderizamos un mini-template con la lista
+            return render(request, '_includes/_all_bookings_list.html', context)
+        return super().get(request, *args, **kwargs)

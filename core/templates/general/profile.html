@@ -31,10 +31,14 @@
     <div class="container">
         <h3>Mis Reservas</h3>
         <div>
-            {% if bookings %}
+            {% if bookings%}
                 <ul>
                 {% for booking in bookings %}
-                    <li>Espacio común reservado: <strong>{{ booking.resource.name }}</strong> - Fecha que se hizo la reserva: <strong>{{ booking.event_date|date:"d/m/Y H:i" }}</strong> - Fecha del evento: <strong>{{ booking.event_date|date:"d/m/Y" }} </strong> <a href="{% url 'reservation_detail' booking.pk %}">Ver detalle</a></li>
+                    <li>
+                        Espacio común reservado: <strong>{{ booking.resource.name }}</strong> 
+                        - Fecha que se hizo la reserva: <strong>{{ booking.event_date|date:"d/m/Y H:i" }}</strong> 
+                        - Fecha del evento: <strong>{{ booking.event_date|date:"d/m/Y" }} </strong> <a href="{% url 'reservation_detail' booking.pk %}">Ver detalle</a>
+                    </li>
                 {% endfor %}
                 </ul>
             {% else %}
@@ -47,23 +51,59 @@
     </div>
 
     <div>
-        <h3>Todas las Reservas</h3>
+        <h3>Reservas del Departamento</h3>
         <div>
-            {{ all_bookings.count }} reservas realizadas por los usuarios:
             {% if all_bookings %}
                 <ul>
-                    {% for booking in all_bookings %}
-                        <li>
-                            <strong>Departamento:</strong> {{ booking.user.resident_profile.department }} 
-                            - <strong>Espacio común reservado:</strong> {{ booking.resource.name }} 
-                            - <strong>Fecha del evento:</strong> {{ booking.event_date|date:"d/m/Y H:i" }} 
-                            - <strong>Estado:</strong> {% if booking.resource.is_available %}Disponible{% else %}No disponible{% endif %}
-                        </li>
-                    {% endfor %}
+                {% for booking in all_bookings %}
+                {% if booking.user.resident_profile.department == user.resident_profile.department %}
+                    <li>
+                        <strong>Usuario que hizo la reserva:</strong> {{ booking.user.first_name }} {{ booking.user.last_name }}
+                        - <strong>Departamento:</strong> {{ booking.user.resident_profile.department }} 
+                        - <strong>Espacio común reservado:</strong> {{ booking.resource.name }} 
+                        - <strong>Fecha del evento:</strong> {{ booking.event_date|date:"d/m/Y" }}
+                    </li>
+                {% endif %}
+                {% endfor %}
                 </ul>
             {% else %}
                 <p> Ninguna por ahora </p>
             {% endif %}
+        </div>
     </div>
+
+    <div>
+        <h3>Todas las Reservas</h3>
+        
+        <input type="text" id="deptSearch" placeholder="Filtrar por usuario, departamento o espacio común..." 
+            style="margin-bottom: 15px; padding: 5px; width: 100%;">
+
+        <div id="all-bookings-container">
+            {% include '_includes/_all_bookings_list.html' %}
+        </div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('deptSearch');
+        const container = document.getElementById('all-bookings-container');
+
+        let timeout = null;
+
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(timeout); // Limpiamos el timer anterior
+            const query = e.target.value;
+
+            // Esperamos 300ms antes de disparar la búsqueda
+            timeout = setTimeout(() => {
+                fetch(`?dept=${query}`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(response => response.text())
+                .then(data => {
+                    container.innerHTML = data;
+                });
+            }, 300); 
+        });
+    </script>
 
 {% endblock %}
