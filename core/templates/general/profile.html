@@ -16,12 +16,6 @@
         <h3>Espacios Comunes</h3>
         <p>La comunidad dispone de {{ zones.count }} espacios comunes:</p>
         <div>
-<<<<<<< HEAD
-            <p> Ninguno por ahora </p>
-        </div>
-        <div>
-            <p><a href="{% url 'reservation_create' %}">Reserva tu espacio común</a></p>
-=======
             {% if zones %}
                 <ul>
                 {% for zone in zones %}
@@ -31,7 +25,6 @@
             {% else %}
                 <p> Ninguno por ahora </p>
             {% endif %}
->>>>>>> feature/crud-reservations
         </div>
     </div>
 

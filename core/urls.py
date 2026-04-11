@@ -17,11 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from .views import HomeView, LoginView, RegisterView, LegalView, ContactView, logout_view, ProfileView
-<<<<<<< HEAD
-from zones.views import ReservationCreateView
-=======
 from zones.views import BookingCreateView, BookingDetailView, BookingUpdateView, BookingDeleteView
->>>>>>> feature/crud-reservations
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,14 +27,9 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('contact/', ContactView.as_view(), name='contact'),
     path('legal/', LegalView.as_view(), name='legal'),
-<<<<<<< HEAD
-    path('profile/', ProfileView.as_view(), name='profile'), # Por ahora el profile es lo mismo que el home, pero luego lo cambiaremos para que muestre información personalizada del usuario
-    path('reservations/create/', ReservationCreateView.as_view(), name='reservation_create'),
-=======
     path('profile/', ProfileView.as_view(), name='profile'), 
     path('reservations/create/', BookingCreateView.as_view(), name='reservation_create'),
     path('reservations/detail/<int:pk>', BookingDetailView.as_view(), name='reservation_detail'),
     path('reservations/update/<int:pk>', BookingUpdateView.as_view(), name='reservation_update'),
     path('reservations/delete/<int:pk>', BookingDeleteView.as_view(), name='reservation_delete'),
->>>>>>> feature/crud-reservations
 ]

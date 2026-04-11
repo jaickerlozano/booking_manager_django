@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import BookingModelFormCreate
+from .forms import ReservationModelFormCreate
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView, DetailView
 from django.urls import reverse_lazy
@@ -11,7 +11,7 @@ from .models import Booking
 # Create your views here.
 class BookingCreateView(LoginRequiredMixin, CreateView):
     model = Booking
-    form_class = BookingModelFormCreate
+    form_class = ReservationModelFormCreate
     template_name = 'reservations/reservation_create.html'
     success_url = reverse_lazy('profile')
     
