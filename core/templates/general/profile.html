@@ -3,15 +3,73 @@
 {% block head_title %}Profile{% endblock %}
 
 {% block content %}
-    <h2>Profile {{ user.first_name }} - Dpto {{ user.resident_profile.department }} </h2>
+    <div>
+        <h2>Profile {{ user.first_name }} - Dpto {{ user.resident_profile.department }} </h2>
+        <h3>Información Personal</h3>
+        <p><strong>Nombre:</strong> {{ user.first_name }}</p>
+        <p><strong>Apellido:</strong> {{ user.last_name }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Departamento:</strong> {{ user.resident_profile.department }}</p>
+    </div>
+
+    <div>
+        <h3>Espacios Comunes</h3>
+        <p>La comunidad dispone de {{ zones.count }} espacios comunes:</p>
+        <div>
+<<<<<<< HEAD
+            <p> Ninguno por ahora </p>
+        </div>
+        <div>
+            <p><a href="{% url 'reservation_create' %}">Reserva tu espacio común</a></p>
+=======
+            {% if zones %}
+                <ul>
+                {% for zone in zones %}
+                    <li><strong>Zona:</strong> {{ zone.name }} - <strong>Descripción:</strong> {{ zone.description }} - <strong>Capacidad:</strong> {{ zone.capacity }} personas</li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p> Ninguno por ahora </p>
+            {% endif %}
+>>>>>>> feature/crud-reservations
+        </div>
+    </div>
 
     <div class="container">
-        <h3>Espacio Común Reservado</h3>
+        <h3>Mis Reservas</h3>
         <div>
-            <p> Ninguno por ahora </p>
+            {% if bookings %}
+                <ul>
+                {% for booking in bookings %}
+                    <li>Espacio común reservado: <strong>{{ booking.resource.name }}</strong> - Fecha que se hizo la reserva: <strong>{{ booking.event_date|date:"d/m/Y H:i" }}</strong> - Fecha del evento: <strong>{{ booking.event_date|date:"d/m/Y" }} </strong> <a href="{% url 'reservation_detail' booking.pk %}">Ver detalle</a></li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p> Ninguna por ahora </p>
+            {% endif %}
         </div>
         <div>
             <p><a href="{% url 'reservation_create' %}">Reserva tu espacio común</a></p>
         </div>
     </div>
+
+    <div>
+        <h3>Todas las Reservas</h3>
+        <div>
+            {% if bookings %}
+                <ul>
+                    {% for booking in bookings %}
+                        <li>
+                            <strong>Departamento:</strong> {{ booking.user.resident_profile.department }} 
+                            - <strong>Espacio común reservado:</strong> {{ booking.resource.name }} 
+                            - <strong>Fecha del evento:</strong> {{ booking.event_date|date:"d/m/Y H:i" }} 
+                            - <strong>Estado:</strong> {% if booking.resource.is_available %}Disponible{% else %}No disponible{% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p> Ninguna por ahora </p>
+            {% endif %}
+    </div>
+
 {% endblock %}

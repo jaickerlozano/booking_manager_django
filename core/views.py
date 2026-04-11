@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.decorators import method_decorator
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.views import LoginView as DjangoLoginView
+from zones.models import Zone
 
 # Create your views here.
 class HomeView(TemplateView):
@@ -66,3 +67,9 @@ def logout_view(request):
 
 class ProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'general/profile.html'
+    # Con este método, cada vez que se renderice el profile, se añadirá al contexto la lista de reservas del usuario logueado. Esto es útil para mostrar las reservas en el perfil.
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['zones'] = Zone.objects.all()
+        context['bookings'] = self.request.user.bookings.all()
+        return context
