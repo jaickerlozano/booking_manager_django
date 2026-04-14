@@ -8,5 +8,9 @@ class ReservationModelFormCreate(ModelForm):
         model = Booking
         fields = ['resource', 'event_date']
         widgets = {
-            'event_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'event_date': forms.DateTimeInput(
+                attrs={
+                    'type': 'datetime-local',
+                }),
         }
+

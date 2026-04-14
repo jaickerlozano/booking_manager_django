@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Booking
-
+from datetime import datetime
 
 # Create your views here.
 class BookingCreateView(LoginRequiredMixin, CreateView):
@@ -19,9 +19,14 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         form.instance.resource = form.cleaned_data['resource']
-        event_date = form.cleaned_data['event_date']
+        event_date = form.cleaned_data['event_date'].date()
+        current_date = datetime.now().date()  # La fecha actual
 
-        if Booking.objects.filter(resource=form.instance.resource, event_date__date=event_date.date()).exists():
+        if event_date <= current_date:
+            messages.error(self.request, "La fecha del evento no puede ser antes o igual a la fecha actual. Intente nuevamente con una fecha válida.")
+            return self.form_invalid(form)
+
+        if Booking.objects.filter(resource=form.instance.resource, event_date__date=event_date).exists():
             messages.error(self.request, f'El/La {form.instance.resource.name} ya está reservado para la fecha seleccionada. Por favor, elige otro espacio común o fecha.')
             return self.form_invalid(form)
 
