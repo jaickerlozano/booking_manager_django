@@ -4,7 +4,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView, DetailView
 from django.urls import reverse_lazy
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Booking
 
 
@@ -29,8 +29,6 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
         messages.success(self.request, "¡Reserva creada exitosamente!")
         return super().form_valid(form)
 
-        
-
 
 class BookingDetailView(DetailView):
     model = Booking
@@ -43,25 +41,43 @@ class BookingDetailView(DetailView):
     #     return super(BookingDetailView, self).form_valid(form)
 
 
-class BookingUpdateView(LoginRequiredMixin, UpdateView):
+class BookingUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Booking
     fields = ['resource', 'event_date']
     template_name = 'reservations/reservation_update.html'
     success_url = reverse_lazy('profile')
 
+    def test_func(self):
+        # Comprueba si el usuario actual es el dueño de la reserva a actualizar
+        return self.get_object().user == self.request.user
+
+    def handle_no_permission(self):
+        # Qué hacer si test_func devuelve False (cuando no es el dueño)
+        messages.error(self.request, "No tienes permiso para editar esta reserva.")
+        return redirect('profile')
+
     def form_valid(self, form):
         messages.success(self.request, "¡Reserva actualizada exitosamente!")
         return super().form_valid(form)
+    
 
-
-class BookingDeleteView(LoginRequiredMixin, DeleteView):
+class BookingDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Booking
     template_name = 'reservations/reservation_delete.html'
     success_url = reverse_lazy('profile')
 
+    def test_func(self):
+        # Comprueba si el usuario actual es el dueño de la reserva a eliminar
+        return self.get_object().user == self.request.user
+
+    def handle_no_permission(self):
+        messages.error(self.request, "No tienes permiso para eliminar esta reserva.")
+        return redirect('profile')
+
     def form_valid(self, form):
-        self.object = self.get_object().resource  # Obtener el recurso asociado a la reserva que se va a eliminar
-        self.object.bookings.filter(pk=self.get_object().pk).delete()  # Eliminar la reserva actual
-        self.object.save()  # Guardar el cambio en el recurso
-        messages.success(self.request, f"¡Reserva eliminada exitosamente! {self.object.pk}")
+        booking = self.get_object()
+        booking_id = booking.pk
+        booking.delete() # Forma estándar de eliminar la instancia
+        messages.success(self.request, f"¡Reserva eliminada exitosamente! {booking_id}")
         return redirect(self.success_url)
+    

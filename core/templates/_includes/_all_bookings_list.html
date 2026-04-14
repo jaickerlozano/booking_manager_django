@@ -6,7 +6,7 @@
             - <strong>Espacio común reservado:</strong> {{ booking.resource.name }} 
             - <strong>Fecha del evento:</strong> {{ booking.event_date|date:"d/m/Y" }}
             <!-- Antes de agregar la siguiente línea, debo revisar la vista detalle para que solo puedan ser editadas por sus propietarios y no por cualquier usuario -->
-            {% comment %} - <a href="{% url 'reservation_detail' booking.pk %}">Ver detalle</a> {% endcomment %}
+            <a href="{% url 'reservation_detail' booking.pk %}">Ver detalle</a>
             
         </li>
     {% empty %}

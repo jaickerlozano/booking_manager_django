@@ -37,7 +37,8 @@
                     <li>
                         Espacio común reservado: <strong>{{ booking.resource.name }}</strong> 
                         - Fecha que se hizo la reserva: <strong>{{ booking.event_date|date:"d/m/Y H:i" }}</strong> 
-                        - Fecha del evento: <strong>{{ booking.event_date|date:"d/m/Y" }} </strong> <a href="{% url 'reservation_detail' booking.pk %}">Ver detalle</a>
+                        - Fecha del evento: <strong>{{ booking.event_date|date:"d/m/Y" }} </strong> 
+                        - <a href="{% url 'reservation_detail' booking.pk %}">Ver detalle</a>
                     </li>
                 {% endfor %}
                 </ul>
@@ -62,6 +63,7 @@
                         - <strong>Departamento:</strong> {{ booking.user.resident_profile.department }} 
                         - <strong>Espacio común reservado:</strong> {{ booking.resource.name }} 
                         - <strong>Fecha del evento:</strong> {{ booking.event_date|date:"d/m/Y" }}
+                        - </strong> <a href="{% url 'reservation_detail' booking.pk %}">Ver detalle</a>
                     </li>
                 {% endif %}
                 {% endfor %}

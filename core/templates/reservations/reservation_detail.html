@@ -4,7 +4,7 @@
 
 {% block content %}
     <h2>Detalle de la Reserva</h2>
-    <p><strong>Usuario:</strong> {{ user.first_name }}</p>
+    <p><strong>Usuario:</strong> {{ booking.user.first_name }} {{ booking.user.last_name }}</p>
     <p><strong>Recurso:</strong> {{ booking.resource.name }}</p>
     <p><strong>Fecha de Inicio:</strong> {{ booking.event_date|date:"d/m/Y H:i" }}</p>
     {% if booking.resource.is_available %}
@@ -13,12 +13,15 @@
         <p><strong>Estado:</strong> No disponible</p>
     {% endif %}
 
+
     <div>
         <p>
-            <a href="{% url 'reservation_update' booking.pk %}">Actualizar reserva</a>
-            -
-            <a href="{% url 'reservation_delete' booking.pk %}">Eliminar reserva</a>
-            -
+            {% if request.user.first_name == booking.user.first_name %}
+                <a href="{% url 'reservation_update' booking.pk %}">Actualizar reserva</a>
+                -
+                <a href="{% url 'reservation_delete' booking.pk %}">Eliminar reserva</a>
+                -
+            {% endif %}
             <a href="{% url 'profile' %}">Volver al perfil</a>
         </p>
     </div>
