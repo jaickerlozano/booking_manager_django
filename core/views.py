@@ -99,3 +99,7 @@ class ProfileView(LoginRequiredMixin, TemplateView):
             # Si es AJAX, solo renderizamos un mini-template con la lista
             return render(request, '_includes/_all_bookings_list.html', context)
         return super().get(request, *args, **kwargs)
+
+
+class DashboardAdminView(TemplateView):
+    template_name = 'general/dashboard_admin.html'
