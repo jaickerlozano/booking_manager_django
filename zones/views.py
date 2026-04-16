@@ -63,6 +63,7 @@ class BookingListView(ListView):
             )
         return queryset
 
+    # Este método lo estoy utilizando para filtrar por departamentos y cantidad de reservas totales que tiene cada uno para luego mostrar en el context del template
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # 'bookings' ya está en el contexto gracias a get_queryset y context_object_name
@@ -78,6 +79,7 @@ class BookingListView(ListView):
 
         return context
 
+    # 
     def get(self, request, *args, **kwargs):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             # Si es una solicitud AJAX, solo queremos devolver la lista filtrada de reservas.

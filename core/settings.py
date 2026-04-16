@@ -143,3 +143,12 @@ LOGOUT_REDIRECT_URL = 'home'
 
 # A dónde mandamos a alguien que intenta entrar a una página protegida sin estar logueado
 LOGIN_URL = 'login'
+
+# Configuración para el envío de correos electrónicos (usado en el formulario de contacto)
+'''Mail is sent using the SMTP host and port specified in the EMAIL_HOST and EMAIL_PORT settings. The EMAIL_HOST_USER and EMAIL_HOST_PASSWORD settings, if set, are used to authenticate to the SMTP server, and the EMAIL_USE_TLS and EMAIL_USE_SSL settings control whether a secure connection is used.'''
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = os.environ.get("SECRET_EMAIL", "django-insecure-default-key-para-desarrollo")
+EMAIL_HOST_PASSWORD = os.environ.get("SECRET_KEY_EMAIL", "django-insecure-default-key-para-desarrollo")
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
