@@ -22,7 +22,11 @@
                 <a href="{% url 'reservation_delete' booking.pk %}">Eliminar reserva</a>
                 -
             {% endif %}
-            <a href="{% url 'profile' %}">Volver al perfil</a>
+            {% if user.administrator_profile %}
+                <a href="{% url 'reservation_list' %}">Volver atrás</a>
+            {% else %}
+                <a href="{% url 'profile' %}">👈 Volver atrás</a>
+            {% endif %}
         </p>
     </div>
 {% endblock %}

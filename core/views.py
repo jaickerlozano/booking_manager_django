@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from users.models import Resident
 from django.contrib import messages
 from django.contrib.auth.models import Group
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.decorators import method_decorator
 from django.contrib.auth import login, logout, authenticate
@@ -22,13 +22,19 @@ class HomeView(TemplateView):
 class LoginView(DjangoLoginView):
     template_name = 'general/login.html'
     authentication_form = LoginForm
-    # Este método solo sirve para la clase LogineView. Si quisieras hacer algo similar en una vista normal, tendrías que hacerlo en el método dispatch, como hiciste en el RegisterView.
+    # Este método solo sirve para la clase LogineView. Si quisiera hacer algo similar en una vista normal, tendría que hacerlo en el método dispatch, como hice en el RegisterView.
     redirect_authenticated_user = True 
 
     def form_valid(self, form):
         # El mensaje solo se envía si el login fue exitoso en este momento
         messages.success(self.request, "¡Bienvenido de nuevo! Has iniciado sesión correctamente.")
         return super().form_valid(form)
+
+    def get_success_url(self):
+        # Redirigir dependiendo del tipo de perfil del usuario
+        if hasattr(self.request.user, 'administrator_profile'):
+            return reverse('dashboard_admin')
+        return reverse('profile')
 
 
 # Este decorador hace que solo los usuarios no autenticados puedan acceder a esta vista. Si un usuario autenticado intenta acceder, será redirigido al home. Es una forma más elegante de hacer lo mismo que hiciste en el dispatch del RegisterView, pero para vistas basadas en clases.
@@ -66,8 +72,19 @@ def logout_view(request):
     return redirect('home')
 
 
-class ProfileView(LoginRequiredMixin, TemplateView):
+class ProfileView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = 'general/profile.html'
+
+    def test_func(self):
+        # Verifica si el usuario logueado tiene un perfil de administrador
+        return hasattr(self.request.user, 'resident_profile')
+
+    def handle_no_permission(self):
+        messages.error(self.request, "No tienes permiso para acceder a este perfil.")
+        if hasattr(self.request.user, 'administrator_profile'):
+            return redirect('dashboard_admin')
+        return redirect('home')
+
     # Con este método, cada vez que se renderice el profile, se añadirá al contexto la lista de reservas del usuario logueado. Esto es útil para mostrar las reservas en el perfil.
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -101,5 +118,19 @@ class ProfileView(LoginRequiredMixin, TemplateView):
         return super().get(request, *args, **kwargs)
 
 
-class DashboardAdminView(TemplateView):
+class DashboardAdminView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = 'general/dashboard_admin.html'
+
+    def test_func(self):
+        # Verifica si el usuario logueado tiene un perfil de administrador
+        return hasattr(self.request.user, 'administrator_profile')
+
+    def handle_no_permission(self):
+        messages.error(self.request, "No tienes permiso para acceder al panel de administración.")
+        return redirect('profile')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['zones'] = Zone.objects.all()
+        context['bookings'] = Booking.objects.all()
+        return context

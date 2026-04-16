@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect
-from .forms import ReservationModelFormCreate
+from .forms import ReservationModelFormCreate, ZoneCreateModelForm
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView, DetailView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import Booking
+from .models import Booking, Zone
 from datetime import datetime
 
 # Create your views here.
@@ -44,6 +44,12 @@ class BookingDetailView(DetailView):
     #     form.instance.user = self.request.user
     #     form.instance.booking = self.get_object() # Este es el espacio que estoy viendo en la detailview
     #     return super(BookingDetailView, self).form_valid(form)
+
+
+class BookingListView(ListView):
+    model = Booking
+    template_name = 'reservations/reservation_list.html'
+    context_object_name = 'bookings'
 
 
 class BookingUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -86,3 +92,68 @@ class BookingDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         messages.success(self.request, f"¡Reserva eliminada exitosamente! {booking_id}")
         return redirect(self.success_url)
     
+
+class ZoneCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Zone
+    form_class = ZoneCreateModelForm
+    template_name = 'zones/zone_create.html'
+    success_url = reverse_lazy('dashboard_admin')
+
+    def test_func(self):
+        # Verifica si el usuario logueado tiene un perfil de administrador
+        return hasattr(self.request.user, 'administrator_profile')
+
+    def handle_no_permission(self):
+        messages.error(self.request, "No tienes permiso para crear espacios comunes.")
+        return redirect('profile')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "¡Espacio común creado exitosamente!")
+        return super().form_valid(form)
+
+
+class ZoneListView(ListView):
+    model = Zone
+    template_name = 'zones/zone_list.html'
+    context_object_name = 'zones'   
+
+
+class ZoneUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Zone
+    fields = ['name', 'description']
+    template_name = 'zones/zone_update.html'
+    success_url = reverse_lazy('dashboard_admin')
+
+    def test_func(self):
+        # Verifica si el usuario logueado tiene un perfil de administrador
+        return hasattr(self.request.user, 'administrator_profile')
+
+    def handle_no_permission(self):
+        messages.error(self.request, "No tienes permiso para editar espacios comunes.")
+        return redirect('profile')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "¡Espacio común actualizado exitosamente!")
+        return super().form_valid(form)
+    
+
+class ZoneDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Zone
+    template_name = 'zones/zone_delete.html'
+    success_url = reverse_lazy('dashboard_admin')
+
+    def test_func(self):
+        # Verifica si el usuario logueado tiene un perfil de administrador
+        return hasattr(self.request.user, 'administrator_profile')
+
+    def handle_no_permission(self):
+        # Verifica si el usuario logueado tiene un perfil de administrador
+        messages.error(self.request, "No tienes permiso para eliminar espacios comunes.")
+        return redirect('profile')
+    
+    def form_valid(self, form):
+        zone = self.get_object()
+        zone_id = zone.pk
+        zone.delete() # Forma estándar de eliminar la instancia
+        messages.success(self.request, f"¡Espacio común eliminado exitosamente! {zone_id}")
+        return redirect(self.success_url)

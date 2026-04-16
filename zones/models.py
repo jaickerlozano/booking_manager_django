@@ -25,6 +25,7 @@ class Booking(models.Model):
     class Meta:
         verbose_name = 'Reserva'
         verbose_name_plural = 'Reservas'
+        ordering = ['event_date']  # Ordenar por fecha del evento, de más reciente a más antiguo
     
     def __str__(self):
         return f"Reserva para {self.resource.name} el {self.event_date} (Reservado el {self.reservation_date})"

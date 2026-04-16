@@ -1,0 +1,13 @@
+{% extends "general/layout.html" %}
+
+{% block head_title %}Register{% endblock %}
+
+{% block content %}
+    <h2>Eliminar Espacio Común</h2>
+    <p>¿Estás seguro de que deseas eliminar este espacio común?</p>
+    <form action="" method="post">
+        {% csrf_token %}
+        <button type="submit">Sí, eliminar espacio común</button>
+        <a href="{% url 'dashboard_admin' %}">No, volver atrás</a>
+    </form>
+{% endblock content %}

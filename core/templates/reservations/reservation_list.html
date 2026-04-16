@@ -1,0 +1,25 @@
+{% extends "general/layout.html" %}
+
+{% block head_title %}Reservation List{% endblock %}
+
+{% block content %}
+    <h2>Lista de Reservas</h2>
+    {% if bookings %}
+    <ul>
+        {% for booking in bookings %}
+            <li>
+                Departamento {{ booking.user.resident_profile.department }} -
+                {{ booking.resource.name }} -
+                <a href="{% url 'reservation_detail' booking.pk %}">{{ booking.event_date|date:"d/m/Y"}}</a>
+            </li>
+        {% empty %}
+            <li>No hay reservas disponibles.</li>
+        {% endfor %}
+    </ul>    
+    {% endif %}
+    {% if user.administrator_profile %}
+        <a href="{% url 'dashboard_admin' %}">Volver al dashboard</a>
+    {% else %}
+        <a href="{% url 'profile' %}">Volver al perfil</a>
+    {% endif %}
+{% endblock content %}

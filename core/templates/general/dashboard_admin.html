@@ -4,4 +4,34 @@
 
 {% block content %}
     <h2>Dashboard Admin</h2>
+
+    <div>
+        <h3>Espacios Comunes</h3>
+        <p>Crear espacio común: <a href="{% url 'zone_create' %}">Crear espacio común</a></p>
+
+        <h4>Lista de Espacios Comunes</h4>
+        {% if zones %}
+            <ul>
+                {% for zone in zones %}
+                    <li>
+                        {{ zone.name }} 
+                        - {{ zone.description }} 
+                        - Capacidad: {{ zone.capacity }} personas
+                        - <a href="{% url 'zone_update' zone.pk %}">Actualizar</a>
+                        - <a href="{% url 'zone_delete' zone.pk %}">Eliminar</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No hay espacios comunes creados.</p>
+        {% endif %}
+    </div>
+
+    <div>
+        <h3>Reservas</h3>
+        <!-- <p>Crear reserva: <a href="{% url 'reservation_create' %}">Crear reserva</a></p>h3> -->
+
+        <p>Ver todas las reservas: <a href="{% url 'reservation_list' %}">Ver todas las reservas</a></p>
+    </div>
+
 {% endblock content %}

@@ -1,13 +1,13 @@
 {% extends "general/layout.html" %}
 
-{% block head_title %}Register{% endblock %}
+{% block head_title %}Create Zone{% endblock %}
 
 {% block content %}
-    <h2>Registrarse</h2>
+    <h2>Crear Espacio Común</h2>
 
     <form action="" method="post">
         {% csrf_token %}
         {{ form.as_p}}
-        <button>Registrarse</button>
+        <button>Crear Espacio Común</button>
     </form>
 {% endblock content %}
