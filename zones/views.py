@@ -6,7 +6,9 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Booking, Zone
+from users.models import Resident
 from datetime import datetime
+from django.db.models import Count, F, Q
 
 # Create your views here.
 class BookingCreateView(LoginRequiredMixin, CreateView):
@@ -49,8 +51,44 @@ class BookingDetailView(DetailView):
 class BookingListView(ListView):
     model = Booking
     template_name = 'reservations/reservation_list.html'
-    context_object_name = 'bookings'
+    context_object_name = 'bookings' # Aseguramos que el queryset filtrado se llame 'bookings' en el contexto
+    
+    def get_queryset(self):
+        # Este método se encarga de obtener el queryset base y aplicar el filtro de búsqueda.
+        queryset = super().get_queryset() # Obtiene todas las reservas inicialmente
+        query = self.request.GET.get('dept', '')
+        if query:
+            queryset = queryset.filter(
+                Q(user__resident_profile__department__icontains=query)
+            )
+        return queryset
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # 'bookings' ya está en el contexto gracias a get_queryset y context_object_name
+
+        # Agrupamos por departamento para obtener la recurrencia de reservas
+        context['ranking_departamentos'] = Booking.objects.filter(
+            user__resident_profile__isnull=False
+        ).annotate(
+            departamento=F('user__resident_profile__department')
+        ).values('departamento').annotate(
+            total_reservas=Count('id')
+        ).order_by('-total_reservas')[:3]
+
+        return context
+
+    def get(self, request, *args, **kwargs):
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            # Si es una solicitud AJAX, solo queremos devolver la lista filtrada de reservas.
+            self.object_list = self.get_queryset() # Obtiene el queryset filtrado
+            context = self.get_context_data() # Prepara el contexto, incluyendo 'bookings' (la lista filtrada)
+
+            # Renderiza solo el template parcial con la lista de reservas
+            return render(request, '_includes/_booking_list_partial.html', {'bookings': context['bookings']})
+        
+        # Para una solicitud GET normal, procede como siempre (renderiza el template completo)
+        return super().get(request, *args, **kwargs)
 
 class BookingUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Booking

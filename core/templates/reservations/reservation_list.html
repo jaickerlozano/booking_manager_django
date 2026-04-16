@@ -4,22 +4,53 @@
 
 {% block content %}
     <h2>Lista de Reservas</h2>
-    {% if bookings %}
-    <ul>
-        {% for booking in bookings %}
-            <li>
-                Departamento {{ booking.user.resident_profile.department }} -
-                {{ booking.resource.name }} -
-                <a href="{% url 'reservation_detail' booking.pk %}">{{ booking.event_date|date:"d/m/Y"}}</a>
-            </li>
-        {% empty %}
-            <li>No hay reservas disponibles.</li>
-        {% endfor %}
-    </ul>    
-    {% endif %}
+    <input type="text" id="deptSearch" placeholder="Filtrar por departamento..." 
+    style="margin-bottom: 15px; padding: 5px; width: 100%;">
+
+    <div id="all-bookings-container">
+        {# Incluimos el template parcial que contiene la lista de reservas #}
+        {% include '_includes/_booking_list_partial.html' %}
+    </div>
+
+    <div>
+        <h3>Departamentos con más reservas:</h3>
+        <ul>
+            {% for item in ranking_departamentos %}
+                <li>Departamento {{ item.departamento }}: {{ item.total_reservas }} reservas</li>
+            {% empty %}
+                <li>Aún no hay reservas registradas.</li>
+            {% endfor %}
+        </ul>
+    </div>
+    
+
     {% if user.administrator_profile %}
         <a href="{% url 'dashboard_admin' %}">Volver al dashboard</a>
     {% else %}
         <a href="{% url 'profile' %}">Volver al perfil</a>
     {% endif %}
+
+
+    <script>
+        const searchInput = document.getElementById('deptSearch');
+        const container = document.getElementById('all-bookings-container');
+
+        let timeout = null;
+
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(timeout); // Limpiamos el timer anterior
+            const query = e.target.value;
+
+            // Esperamos 300ms antes de disparar la búsqueda
+            timeout = setTimeout(() => {
+                fetch(`?dept=${query}`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(response => response.text())
+                .then(data => {
+                    container.innerHTML = data;
+                });
+            }, 300); 
+        });
+    </script>
 {% endblock content %}
