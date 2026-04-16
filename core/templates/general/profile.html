@@ -12,22 +12,6 @@
         <p><strong>Departamento:</strong> {{ user.resident_profile.department }}</p>
     </div>
 
-    <div>
-        <h3>Espacios Comunes</h3>
-        <p>La comunidad dispone de {{ zones.count }} espacios comunes:</p>
-        <div>
-            {% if zones %}
-                <ul>
-                {% for zone in zones %}
-                    <li><strong>Zona:</strong> {{ zone.name }} - <strong>Descripción:</strong> {{ zone.description }} - <strong>Capacidad:</strong> {{ zone.capacity }} personas</li>
-                {% endfor %}
-                </ul>
-            {% else %}
-                <p> Ninguno por ahora </p>
-            {% endif %}
-        </div>
-    </div>
-
     <div class="container">
         <h3>Mis Reservas</h3>
         <div>
@@ -82,6 +66,24 @@
 
         <div id="all-bookings-container">
             {% include '_includes/_all_bookings_list.html' %}
+        </div>
+    </div>
+
+    <div>
+        <h3>Espacios Comunes</h3>
+        <p>La comunidad dispone de {{ zones.count }} espacios comunes:</p>
+        <div>
+            {% if zones %}
+                <ul>
+                {% for zone in zones %}
+                    <li><strong>Zona:</strong> {{ zone.name }} 
+                    - <strong>Descripción:</strong> {{ zone.description }} 
+                    - <strong>Capacidad:</strong> {{ zone.capacity }} personas</li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p> Ninguno por ahora </p>
+            {% endif %}
         </div>
     </div>
 
