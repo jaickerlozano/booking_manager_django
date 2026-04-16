@@ -34,13 +34,11 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
             return self.form_invalid(form)
 
         form.instance.resource.save()  # Guardar el cambio en el recurso
-        messages.success(self.request, "¡Reserva creada exitosamente!")
 
         nombre = self.request.user.first_name
-        
         email = self.request.user.email
-        mensaje = f"¡{nombre}, tu reserva ha sido creada exitosamente! \nEspacio común: {form.instance.resource.name} \nFecha del evento: {str(form.instance.event_date.date())}"
-        message_content = f"{mensaje}"
+        message_content = f"¡{nombre}, tu reserva ha sido creada exitosamente! \nEspacio común: {form.instance.resource.name} \nFecha del evento: {str(form.instance.event_date.date())}"
+
         send_mail(
             "Notificación de reserva",
             message_content,
@@ -48,6 +46,9 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
             [email],
             fail_silently=False,
         )
+
+        messages.success(self.request, "¡Reserva creada exitosamente!")
+
         return super().form_valid(form)
 
 
@@ -123,7 +124,20 @@ class BookingUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return redirect('profile')
 
     def form_valid(self, form):
-        messages.success(self.request, "¡Reserva actualizada exitosamente!")
+        nombre = self.request.user.first_name
+        email = self.request.user.email
+        message_content = f"¡{nombre}, tu reserva ha sido modificada exitosamente! \nEspacio común: {form.instance.resource.name} \nFecha del evento: {str(form.instance.event_date.date())}" # Mensaje que se inserta en el correo
+
+        send_mail(
+            "Notificación de reserva",
+            message_content,
+            "jlozano.devcode@gmail.com",
+            [email],
+            fail_silently=False,
+        )
+
+        messages.success(self.request, "¡Reserva actualizada exitosamente!") # Mensaje del template
+
         return super().form_valid(form)
     
 
@@ -143,8 +157,21 @@ class BookingDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def form_valid(self, form):
         booking = self.get_object()
         booking_id = booking.pk
+        name = self.request.user.first_name
+        resource = booking.resource.name
+        event_date = str(booking.event_date.date())
+        email = self.request.user.email
         booking.delete() # Forma estándar de eliminar la instancia
-        messages.success(self.request, f"¡Reserva eliminada exitosamente! {booking_id}")
+
+        message_content = f"¡{name}, tu reserva del '{resource}' con fecha: {event_date}, ha sido eliminada exitosamente!" # Mensaje que se inserta en el correo
+        send_mail(
+            "Notificación de reserva",
+            message_content,
+            "jlozano.devcode@gmail.com",
+            [email],
+            fail_silently=False,
+        )
+        messages.success(self.request, f"¡Reserva eliminada exitosamente!")
         return redirect(self.success_url)
     
 
