@@ -18,4 +18,4 @@ class ReservationModelFormCreate(ModelForm):
 class ZoneCreateModelForm(ModelForm):
     class Meta:
         model = Zone
-        fields = ['name', 'description']
+        fields = ['name', 'description', 'capacity']
