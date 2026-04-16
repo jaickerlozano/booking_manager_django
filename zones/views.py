@@ -9,6 +9,7 @@ from .models import Booking, Zone
 from users.models import Resident
 from datetime import datetime
 from django.db.models import Count, F, Q
+from django.core.mail import send_mail
 
 # Create your views here.
 class BookingCreateView(LoginRequiredMixin, CreateView):
@@ -34,6 +35,19 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
 
         form.instance.resource.save()  # Guardar el cambio en el recurso
         messages.success(self.request, "¡Reserva creada exitosamente!")
+
+        nombre = self.request.user.first_name
+        
+        email = self.request.user.email
+        mensaje = f"¡{nombre}, tu reserva ha sido creada exitosamente! \nEspacio común: {form.instance.resource.name} \nFecha del evento: {str(form.instance.event_date.date())}"
+        message_content = f"{mensaje}"
+        send_mail(
+            "Notificación de reserva",
+            message_content,
+            "jlozano.devcode@gmail.com",
+            [email],
+            fail_silently=False,
+        )
         return super().form_valid(form)
 
 
@@ -59,7 +73,8 @@ class BookingListView(ListView):
         query = self.request.GET.get('dept', '')
         if query:
             queryset = queryset.filter(
-                Q(user__resident_profile__department__icontains=query)
+                Q(user__resident_profile__department__icontains=query) |
+                Q(resource__name__icontains=query)
             )
         return queryset
 
