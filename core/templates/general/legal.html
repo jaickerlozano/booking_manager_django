@@ -3,5 +3,91 @@
 {% block head_title %}Legal{% endblock %}
 
 {% block content %}
-    <h2>Esta es la vista de Legal</h2>
+    <div class="bg-gray-50 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto bg-white shadow-md rounded-lg overflow-hidden">
+            
+            <div class="bg-indigo-600 px-6 py-8 text-white">
+                <h1 class="text-3xl font-bold text-center">Aviso Legal y Política de Privacidad</h1>
+                <p class="text-center mt-2 text-indigo-100 uppercase tracking-widest text-sm">Booking Manager - Gestión Residencial</p>
+            </div>
+
+            <div class="p-8 text-gray-700 leading-relaxed space-y-8">
+                
+                <section>
+                    <h2 class="text-xl font-semibold text-indigo-600 border-b-2 border-indigo-100 pb-2 mb-4">1. Información General</h2>
+                    <p>
+                        En cumplimiento con los estándares de transparencia y la normativa vigente, se informa que la plataforma 
+                        <strong>Mi Nidito</strong> (en adelante, "la Aplicación") es un proyecto desarrollado por 
+                        <strong>Jaicker Lozano Flores</strong>.
+                    </p>
+                    <ul class="list-disc ml-6 mt-2 space-y-1">
+                        <li><strong>Titular:</strong> Jaicker Lozano</li>
+                        <li><strong>Email de contacto:</strong>bookingmanager@example.com</li>
+                        <li><strong>Ubicación:</strong> Santiago, Chile</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-semibold text-indigo-600 border-b-2 border-indigo-100 pb-2 mb-4">2. Términos y Condiciones de Uso</h2>
+                    <p>
+                        El acceso y uso de Booking Manager atribuye la condición de <strong>Usuario</strong>. El usuario se compromete a:
+                    </p>
+                    <ul class="list-disc ml-6 mt-2 space-y-2">
+                        <li>Utilizar el sistema de reservas de espacios comunes de buena fe y respetando los reglamentos internos de su comunidad.</li>
+                        <li>No realizar reservas ficticias o bloqueos malintencionados que impidan el uso de las áreas a otros residentes.</li>
+                        <li>Mantener la confidencialidad de sus credenciales de acceso.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-semibold text-indigo-600 border-b-2 border-indigo-100 pb-2 mb-4">3. Política de Privacidad</h2>
+                    <p>
+                        De acuerdo con la Ley 19.628 sobre Protección de la Vida Privada, Booking Manager informa que:
+                    </p>
+                    <div class="bg-indigo-50 p-4 rounded-md mt-4">
+                        <p class="text-sm">
+                            <strong>Finalidad de los datos:</strong> Los datos recopilados (Nombre, Unidad/Departamento, Correo) se utilizan únicamente para la gestión operativa de reservas y notificación de encomiendas. 
+                            <strong>No cedemos datos a terceros</strong> con fines publicitarios o comerciales.
+                        </p>
+                    </div>
+                    <p class="mt-4">
+                        El usuario podrá ejercer sus derechos de acceso, rectificación y cancelación enviando una solicitud al correo electrónico de contacto.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-semibold text-indigo-600 border-b-2 border-indigo-100 pb-2 mb-4">4. Limitación de Responsabilidad</h2>
+                    <p>
+                        Booking Manager es una herramienta tecnológica de gestión. Por lo tanto:
+                    </p>
+                    <ul class="list-disc ml-6 mt-2 space-y-2 text-sm italic">
+                        <li>No se responsabiliza por daños físicos o materiales ocurridos durante el uso de los espacios reservados.</li>
+                        <li>No garantiza la disponibilidad física de los espacios, la cual depende exclusivamente de la administración del edificio.</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2 class="text-xl font-semibold text-indigo-600 border-b-2 border-indigo-100 pb-2 mb-4">5. Propiedad Intelectual</h2>
+                    <p>
+                        Todo el software, código fuente (Django/React), diseño de interfaz y base de datos son propiedad intelectual de <strong>Jaicker Lozano</strong>. Queda prohibida cualquier reproducción o explotación del sistema sin autorización expresa.
+                    </p>
+                </section>
+
+            </div>
+
+            <div class="bg-gray-100 px-8 py-4 text-center text-xs text-gray-500">
+                Última actualización: Abril 2026 | Santiago, Chile.
+            </div>
+        </div>
+        
+        <div class="text-center mt-6">
+            {% if not user.is_authenticated %}
+                <a href="{% url 'home' %}" class="text-indigo-600 hover:underline text-sm font-medium">← Volver al inicio</a>
+            {% elif user.administrator_profile %}
+                <a href="{% url 'dashboard_admin' %}" class="text-indigo-600 hover:underline text-sm font-medium">← Volver al inicio</a>
+            {% elif user.resident_profile %}
+                <a href="{% url 'profile' %}" class="text-indigo-600 hover:underline text-sm font-medium">← Volver al inicio</a>
+            {% endif %}
+        </div>
+    </div>
 {% endblock content %}
