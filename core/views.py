@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, reverse
 from django.views.generic import TemplateView
-from .forms import ResidentRegistrationForm, LoginForm
+from .forms import ResidentRegistrationForm, LoginForm, ContactForm
 from django.views.generic.edit import CreateView, FormView
 from django.urls import reverse_lazy
 from users.models import Resident
@@ -13,6 +13,8 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from zones.models import Zone, Booking
 from django.db.models import Q
+from django.core.mail import send_mail
+
 
 # Create your views here.
 class HomeView(TemplateView):
@@ -58,8 +60,28 @@ class RegisterView(CreateView):
         return super().form_valid(form)
 
 
-class ContactView(TemplateView):
+class ContactView(FormView):
+    form_class = ContactForm
     template_name = 'general/contact.html'
+    success_url = reverse_lazy('contact')
+
+    def form_valid(self, form):
+        nombre = form.cleaned_data['name']
+        email = form.cleaned_data['email']
+        mensaje = form.cleaned_data['message']
+        message_content = f"Nombre del contacto: {nombre} \nCorreo electrónico: {email} \nMensaje: {mensaje}" # Mensaje que se inserta en el correo
+
+        send_mail(
+            "Notificación de contacto",
+            message_content,
+            "jlozano.devcode@gmail.com",
+            ["jaickerlozano@outlook.com"],
+            fail_silently=False,
+        )
+        messages.success(self.request, "¡Su mensaje ha sido enviado exitosamente! Nos contactaremos con usted a la brevedad.")
+
+        return super().form_valid(form)
+
 
     
 class LegalView(TemplateView):

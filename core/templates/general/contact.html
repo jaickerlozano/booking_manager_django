@@ -4,4 +4,10 @@
 
 {% block content %}
     <h2>Esta es la vista de Contacto</h2>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p}}
+        <button>Enviar</button>
+    </form>
 {% endblock content %}

@@ -48,3 +48,12 @@ class LoginForm(AuthenticationForm):
         super().__init__(*args, **kwargs)
         self.fields['username'].label = "Nombre de usuario"
         self.fields['password'].label = "Contraseña"
+
+
+class ContactForm(forms.Form):
+    name = forms.CharField(label='Nombre', max_length=100)
+    email = forms.EmailField(label='Correo electrónico')
+    message = forms.CharField(label='Mensaje', widget=forms.Textarea)
+
+
+
