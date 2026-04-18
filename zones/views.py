@@ -115,8 +115,8 @@ class BookingUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     success_url = reverse_lazy('profile')
 
     def test_func(self):
-        # Comprueba si el usuario actual es el dueño de la reserva a actualizar
-        return self.get_object().user == self.request.user
+        # Comprueba si el usuario actual es el dueño de la reserva a actualizar o si tiene perfil de administrador
+        return self.get_object().user == self.request.user or self.request.user.administrator_profile
 
     def handle_no_permission(self):
         # Qué hacer si test_func devuelve False (cuando no es el dueño)
@@ -147,8 +147,8 @@ class BookingDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     success_url = reverse_lazy('profile')
 
     def test_func(self):
-        # Comprueba si el usuario actual es el dueño de la reserva a eliminar
-        return self.get_object().user == self.request.user
+        # Comprueba si el usuario actual es el dueño de la reserva a eliminar o si tiene perfil de adminstrador
+        return self.get_object().user == self.request.user or self.request.user.administrator_profile
 
     def handle_no_permission(self):
         messages.error(self.request, "No tienes permiso para eliminar esta reserva.")

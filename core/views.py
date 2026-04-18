@@ -55,9 +55,27 @@ class RegisterView(CreateView):
     #     return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
+        nombre = form.cleaned_data['first_name']
+        email = form.cleaned_data['email']
+        department = form.cleaned_data['department']
+        
+        # Ejecutamos el guardado de CreateView (que llama a form.save() internamente de forma segura)
+        # y guardamos la respuesta para devolverla al final.
+        response = super().form_valid(form)
+        
+        message_content = f"¡Hola {nombre}! \n Tu registro ha sido exitoso. Ahora puedes iniciar sesión. \nNombre del contacto: {nombre} \nCorreo electrónico: {email} \nNúmero de departamento: {department}" # Mensaje que se inserta en el correo
+
+        send_mail(
+            "Notificación de contacto",
+            message_content,
+            "jlozano.devcode@gmail.com",
+            [email],
+            fail_silently=False,
+        )
+
         messages.success(self.request, "¡Registro exitoso! Ahora puedes iniciar sesión.")
 
-        return super().form_valid(form)
+        return response
 
 
 class ContactView(FormView):

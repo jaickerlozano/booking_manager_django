@@ -16,17 +16,13 @@
 
     <div>
         <p>
-            {% if request.user.first_name == booking.user.first_name %}
+            {% if request.user.first_name == booking.user.first_name or user.administrator_profile %}
                 <a href="{% url 'reservation_update' booking.pk %}">Actualizar reserva</a>
                 -
                 <a href="{% url 'reservation_delete' booking.pk %}">Eliminar reserva</a>
                 -
             {% endif %}
-            {% if user.administrator_profile %}
-                <a href="{% url 'reservation_list' %}">Volver atrás</a>
-            {% else %}
-                <a href="{% url 'profile' %}">👈 Volver atrás</a>
-            {% endif %}
+            <a href="{% url 'profile' %}">👈 Volver atrás</a>
         </p>
     </div>
 {% endblock %}

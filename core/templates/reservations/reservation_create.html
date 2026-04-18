@@ -8,6 +8,13 @@
     <form action="" method="post">
         {% csrf_token %}
         {{ form.as_p}}
-        <button>Crear Reserva</button>
+        <div>
+            <button>Crear Reserva</button> 
+            {% if user.resident_profile %}
+                <a href="{% url 'profile' %}">Volver a 👈atrás</a>
+            {% else %}
+                <a href="{% url 'dashboard_admin' %}">Volver a 👈atrás</a>
+            {% endif %}
+        </div>
     </form>
 {% endblock content %}
