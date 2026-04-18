@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from .views import HomeView, LoginView, RegisterView, LegalView, ContactView, logout_view, ProfileView, DashboardAdminView
-from zones.views import BookingCreateView, BookingDetailView, BookingUpdateView, BookingDeleteView, ZoneCreateView, ZoneUpdateView, ZoneDeleteView, ZoneListView, BookingListView
+from zones.views import AdminBookingCreateView, BookingCreateView, BookingDetailView, BookingUpdateView, BookingDeleteView, ZoneCreateView, ZoneUpdateView, ZoneDeleteView, ZoneListView, BookingListView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,6 +30,7 @@ urlpatterns = [
     path('legal/', LegalView.as_view(), name='legal'),
     path('profile/', ProfileView.as_view(), name='profile'), 
     path('reservations/create/', BookingCreateView.as_view(), name='reservation_create'),
+    path('reservations/admin-create/', AdminBookingCreateView.as_view(), name='admin_reservation_create'),
     path('reservations/detail/<int:pk>', BookingDetailView.as_view(), name='reservation_detail'),
     path('reservations/list/', BookingListView.as_view(), name='reservation_list'),
     path('reservations/update/<int:pk>', BookingUpdateView.as_view(), name='reservation_update'),

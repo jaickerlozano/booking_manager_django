@@ -1,0 +1,17 @@
+{% extends "general/layout.html" %}
+
+{% block head_title %}Create Reservation{% endblock %}
+
+{% block content %}
+    <h2>Reservar espacio común para el residente</h2>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p}}
+        <div>
+            <button>Crear Reserva</button> 
+            -
+            <a href="{% url 'dashboard_admin' %}">Volver a 👈atrás</a>
+        </div>
+    </form>
+{% endblock content %}

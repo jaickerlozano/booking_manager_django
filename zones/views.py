@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import ReservationModelFormCreate, ZoneCreateModelForm
+from .forms import ReservationModelFormCreate, ZoneCreateModelForm, AdminReservationModelFormCreate
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView, DetailView
 from django.urls import reverse_lazy
@@ -17,7 +17,7 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
     form_class = ReservationModelFormCreate
     template_name = 'reservations/reservation_create.html'
     success_url = reverse_lazy('profile')
-    
+
     # Con este método lo que hacemos es asignar el usuario logueado a la reserva que se está creando. De esta forma, cada reserva estará asociada al usuario que la creó, lo cual es fundamental para luego mostrar las reservas en el perfil del usuario.
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -48,6 +48,50 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
         )
 
         messages.success(self.request, "¡Reserva creada exitosamente!")
+
+        return super().form_valid(form)
+
+
+class AdminBookingCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = Booking
+    form_class = AdminReservationModelFormCreate
+    template_name = 'reservations/admin_reservation_create.html'
+    success_url = reverse_lazy('dashboard_admin')
+
+    # Este método verifica si 
+    def test_func(self):
+        return hasattr(self.request.user, 'administrator_profile')
+
+    def handle_no_permission(self):
+        messages.error(self.request, "No tienes permiso para realizar esta acción.")
+        return redirect('profile')
+
+    def form_valid(self, form):
+        event_date = form.cleaned_data['event_date'].date()
+        current_date = datetime.now().date()
+
+        if event_date <= current_date:
+            messages.error(self.request, "La fecha del evento no puede ser antes o igual a la fecha actual. Intente nuevamente con una fecha válida.")
+            return self.form_invalid(form)
+
+        if Booking.objects.filter(resource=form.instance.resource, event_date__date=event_date).exists():
+            messages.error(self.request, f'El/La {form.instance.resource.name} ya está reservado para la fecha seleccionada. Por favor, elige otro espacio común o fecha.')
+            return self.form_invalid(form)
+
+        resident_user = form.cleaned_data['user']
+        nombre = resident_user.first_name
+        email = resident_user.email
+        message_content = f"¡Hola {nombre}! \nEl administrador ha creado una reserva a tu nombre. \n\nDetalles de la reserva: \nEspacio común: {form.instance.resource.name} \nFecha del evento: {str(form.instance.event_date.date())}"
+
+        send_mail(
+            "Notificación de reserva creada por administrador",
+            message_content,
+            "jlozano.devcode@gmail.com",
+            [email],
+            fail_silently=False,
+        )
+
+        messages.success(self.request, f"¡Reserva creada exitosamente para {resident_user.get_full_name()}!")
 
         return super().form_valid(form)
 
