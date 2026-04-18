@@ -1,7 +1,7 @@
 <ul>
     {% for booking in all_bookings %}
         <li>
-            <strong>Usuario que hizo la reserva:</strong> {{ booking.user.first_name }} {{ booking.user.last_name }}
+            <strong>Usuario:</strong> {{ booking.user.first_name }} {{ booking.user.last_name }}
             - <strong>Departamento:</strong> {{ booking.user.resident_profile.department }} 
             - <strong>Espacio común reservado:</strong> {{ booking.resource.name }} 
             - <strong>Fecha del evento:</strong> {{ booking.event_date|date:"d/m/Y" }}
