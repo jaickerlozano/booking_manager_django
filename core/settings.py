@@ -48,7 +48,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'django_extensions',
-
+    'tailwind',
+    'theme',
+    'django_browser_reload',
+    
+    'core',
     'users',
     'zones',
 ]
@@ -61,6 +65,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -152,3 +157,9 @@ EMAIL_HOST_USER = os.environ.get("SECRET_EMAIL", "django-insecure-default-key-pa
 EMAIL_HOST_PASSWORD = os.environ.get("SECRET_KEY_EMAIL", "django-insecure-default-key-para-desarrollo")
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
+
+# Constante para Tailwind
+TAILWIND_APP_NAME = "theme"
+INTERNAL_IPS = [
+    "127.0.0.1",
+]

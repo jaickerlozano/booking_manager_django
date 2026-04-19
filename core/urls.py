@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.urls import include
 from .views import HomeView, LoginView, RegisterView, LegalView, ContactView, logout_view, ProfileView, DashboardAdminView
 from zones.views import AdminBookingCreateView, BookingCreateView, BookingDetailView, BookingUpdateView, BookingDeleteView, ZoneCreateView, ZoneUpdateView, ZoneDeleteView, ZoneListView, BookingListView
 
@@ -39,4 +40,5 @@ urlpatterns = [
     path('zones/update/<int:pk>', ZoneUpdateView.as_view(), name='zone_update'),
     path('zones/delete/<int:pk>', ZoneDeleteView.as_view(), name='zone_delete'),
     path('zones/', ZoneListView.as_view(), name='zone_list'),
+    path("__reload__/", include("django_browser_reload.urls")),
 ]
