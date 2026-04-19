@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+/* 1. Apuntamos directamente a tu carpeta core/templates (evitando el entorno virtual 'env') */
+@source "../../../core/templates";
+
+/* 2. Apuntamos a Flowbite para que genere las clases del Navbar y componentes */
+@source "../node_modules/flowbite";
+
+/* 3. Cargar el plugin de Flowbite */
+@plugin "flowbite/plugin";
+
+/* 4. Tu paleta de colores personalizada */
+@theme {
+  --color-brand-blue: #1e3a8a;
+  --color-brand-emerald: #10b981;
+}
