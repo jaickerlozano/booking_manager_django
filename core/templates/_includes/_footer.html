@@ -1,8 +1,10 @@
-<footer>
-    <div class="container">
-        <p>
-            2026 Gestor de Reservas para Espacios Comunes en Comunidades. Todos los derechos reservados. 
-            <a href="{% url 'legal' %}">Aviso Legal</a>
+<footer class="bg-white border-t border-gray-200 mt-auto shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
+        <p class="text-sm text-gray-500 text-center md:text-left">
+            &copy; 2026 <span class="font-semibold text-brand-blue">Booking Manager</span>. Gestor de espacios comunes. Todos los derechos reservados.
         </p>
+        <div class="flex items-center justify-center">
+            <a href="{% url 'legal' %}" class="text-sm font-medium text-gray-500 hover:text-brand-blue hover:underline transition-colors">Aviso Legal</a>
+        </div>
     </div>
 </footer>
