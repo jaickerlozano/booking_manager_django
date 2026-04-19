@@ -16,6 +16,16 @@ class ReservationModelFormCreate(ModelForm):
                 }),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['resource'].label = "Espacio a reservar"
+        self.fields['event_date'].label = "Fecha y hora del evento"
+        
+        # Agregamos las clases de Tailwind y Flowbite a los inputs
+        for field in self.fields.values():
+            field.widget.attrs.update({
+                'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand-blue focus:border-brand-blue block w-full p-2.5'
+            })
 
 class ZoneCreateModelForm(ModelForm):
     class Meta:
@@ -41,3 +51,11 @@ class AdminReservationModelFormCreate(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['user'].label_from_instance = lambda obj: f"{obj.get_full_name()} - Depto: {obj.resident_profile.department}"
+        self.fields['resource'].label = "Espacio a reservar"
+        self.fields['event_date'].label = "Fecha y hora del evento"
+        
+        # Agregamos las clases de Tailwind y Flowbite a los inputs (incluyendo el select de usuario)
+        for field in self.fields.values():
+            field.widget.attrs.update({
+                'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand-blue focus:border-brand-blue block w-full p-2.5'
+            })

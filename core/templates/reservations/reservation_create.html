@@ -1,20 +1,55 @@
 {% extends "general/layout.html" %}
 
-{% block head_title %}Create Reservation{% endblock %}
+{% block head_title %}Crear Reserva | Booking Manager{% endblock %}
 
 {% block content %}
-    <h2>Reserva tu espacio común</h2>
+<div class="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-0 mt-4">
+    <div class="w-full bg-white rounded-2xl shadow-sm border md:mt-0 sm:max-w-lg xl:p-0 border-gray-200">
+        <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+            <div class="text-center mb-6">
+                <h1 class="text-2xl font-bold leading-tight tracking-tight text-gray-900">
+                    Reserva tu espacio común
+                </h1>
+                <p class="text-sm text-gray-500 mt-2">Selecciona el área que deseas utilizar y la fecha de tu evento.</p>
+            </div>
+            
+            <form class="space-y-4 md:space-y-6" method="POST">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                    <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50" role="alert">
+                        {% for error in form.non_field_errors %}
+                            <span class="font-medium">{{ error }}</span><br>
+                        {% endfor %}
+                    </div>
+                {% endif %}
 
-    <form action="" method="post">
-        {% csrf_token %}
-        {{ form.as_p}}
-        <div>
-            <button>Crear Reserva</button> 
-            {% if user.resident_profile %}
-                <a href="{% url 'profile' %}">Volver a 👈atrás</a>
-            {% else %}
-                <a href="{% url 'dashboard_admin' %}">Volver a 👈atrás</a>
-            {% endif %}
+                <div class="space-y-4">
+                    {% for field in form %}
+                    <div>
+                        <label for="{{ field.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <p class="mt-2 text-sm text-red-600">
+                                {% for error in field.errors %}{{ error }}{% endfor %}
+                            </p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="pt-4 flex flex-col sm:flex-row gap-3">
+                    <button type="submit" class="w-full text-white bg-brand-emerald hover:bg-emerald-600 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center flex items-center justify-center transition-colors">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Confirmar Reserva
+                    </button>
+                    
+                    <a href="{% if user.resident_profile %}{% url 'profile' %}{% else %}{% url 'dashboard_admin' %}{% endif %}" class="w-full text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 hover:text-red-800 focus:ring-4 focus:outline-none focus:ring-red-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center flex items-center justify-center transition-colors">
+                        Cancelar y Volver
+                    </a>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
+</div>
 {% endblock content %}
