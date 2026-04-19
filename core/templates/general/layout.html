@@ -1,32 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block head_title %}Document{% endblock head_title %}</title>
+    <!-- 1. Cargar las etiquetas de Tailwind -->
+    {% load tailwind_tags %}
+
+    <!-- 2. Imprimir el link al archivo CSS compilado -->
+    {% tailwind_css %}
 </head>
-<body>
+<body class="flex flex-col min-h-screen bg-gray-50 font-sans antialiased">
 
     {% include '_includes/_header.html' %}
     
-    {% include '_includes/_messages.html' %}
+    <main class="flex-grow pt-24 pb-12 px-4 sm:px-6 lg:px-8 w-full max-w-7xl mx-auto">
+        {% include '_includes/_messages.html' %}
 
-    {% block content %}
-
-    {% endblock %}
+        {% block content %}
+        {% endblock %}
+    </main>
     
     {% include '_includes/_footer.html' %}
 
-    <!-- <script>
-        // Auto-hide alerts after 4 seconds
-        setTimeout(function() {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(alert => {
-                const bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            });
-        }, 4000);
-    </script> -->
-    
+    <!-- Script de flowbite para interactividad (que agregamos antes) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 </body>
 </html>
