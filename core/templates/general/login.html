@@ -1,15 +1,48 @@
 {% extends "general/layout.html" %}
 
-{% block head_title %}Login{% endblock %}
+{% block head_title %}Iniciar Sesión{% endblock %}
 
 {% block content %}
-    <h2>Iniciar sesión</h2>
+<div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-[70vh] lg:py-0">
+    <div class="w-full bg-white rounded-lg shadow-sm border md:mt-0 sm:max-w-md xl:p-0 border-gray-200">
+        <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+            <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl text-center">
+                Iniciar Sesión
+            </h1>
+            <form class="space-y-4 md:space-y-6" method="POST">
+                {% csrf_token %}
+                
+                <!-- Si el usuario se equivoca de credenciales -->
+                {% if form.non_field_errors %}
+                    <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50" role="alert">
+                        {% for error in form.non_field_errors %}
+                            <span class="font-medium">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
 
-    <form action="" method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button>Iniciar sesión</button>
-    </form>
-
-    <p>¿No tienes una cuenta? <a href="{% url 'register' %}">Regístrate</a></p>
+                <!-- Renderizamos los campos (Usuario y Contraseña) -->
+                {% for field in form %}
+                <div>
+                    <label for="{{ field.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900">{{ field.label }}</label>
+                    
+                    {{ field }} <!-- El input se estiliza gracias a @tailwindcss/forms -->
+                    
+                    {% if field.errors %}
+                        <p class="mt-2 text-sm text-red-600">
+                            {% for error in field.errors %}{{ error }}{% endfor %}
+                        </p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                
+                <button type="submit" class="w-full text-white bg-brand-blue hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Ingresar a mi cuenta</button>
+                
+                <p class="text-sm font-light text-gray-500">
+                    ¿No tienes una cuenta en la comunidad? <a href="{% url 'register' %}" class="font-medium text-brand-blue hover:underline">Regístrate aquí</a>
+                </p>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
