@@ -1,87 +1,143 @@
 {% extends "general/layout.html" %}
 
-{% block head_title %}Profile{% endblock %}
+{% block head_title %}Mi Perfil | Booking Manager{% endblock %}
 
 {% block content %}
-    <div>
-        <h2>Profile {{ user.first_name }} - Dpto {{ user.resident_profile.department }} </h2>
-        <h3>Información Personal</h3>
-        <p><strong>Nombre:</strong> {{ user.first_name }}</p>
-        <p><strong>Apellido:</strong> {{ user.last_name }}</p>
-        <p><strong>Email:</strong> {{ user.email }}</p>
-        <p><strong>Departamento:</strong> {{ user.resident_profile.department }}</p>
+<div class="space-y-6">
+
+    <!-- Tarjeta de Cabecera: Perfil de Usuario -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 flex flex-col md:flex-row items-center md:items-start gap-6">
+        <div class="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center text-brand-blue flex-shrink-0 border-4 border-white shadow-md">
+            <!-- Icono de usuario genérico -->
+            <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+        </div>
+        <div class="flex-1 text-center md:text-left w-full">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900">Hola, {{ user.first_name }}</h2>
+                    <p class="text-gray-500 text-lg mt-1">Departamento <span class="font-semibold text-brand-blue">{{ user.resident_profile.department }}</span></p>
+                    <div class="mt-4 flex flex-wrap justify-center md:justify-start gap-3">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gray-50 border border-gray-200 text-sm text-gray-600 font-medium">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            {{ user.email }}
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gray-50 border border-gray-200 text-sm text-gray-600 font-medium">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            {{ user.first_name }} {{ user.last_name }}
+                        </span>
+                    </div>
+                </div>
+                <div class="flex-shrink-0 mt-4 md:mt-0">
+                    <a href="{% url 'reservation_create' %}" class="inline-flex items-center justify-center px-5 py-3 text-sm font-semibold text-white bg-brand-emerald hover:bg-emerald-600 rounded-xl shadow-sm focus:ring-4 focus:ring-emerald-200 transition-colors w-full">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        Reservar espacio
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="container">
-        <h3>Mis Reservas</h3>
-        <div>
-            {% if bookings%}
-                <ul>
-                {% for booking in bookings %}
-                    <li>
-                        Espacio común reservado: <strong>{{ booking.resource.name }}</strong> 
-                        - Fecha que se hizo la reserva: <strong>{{ booking.event_date|date:"d/m/Y H:i" }} hrs</strong> 
-                        - Fecha del evento: <strong>{{ booking.event_date|date:"d/m/Y" }} </strong> 
-                        - <a href="{% url 'reservation_detail' booking.pk %}">Ver detalle</a>
-                    </li>
-                {% endfor %}
-                </ul>
-            {% else %}
-                <p> Ninguna por ahora </p>
-            {% endif %}
+    <!-- Grid de 2 Columnas para Reservas -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
+        <!-- Columna 1: Mis Reservas -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-full">
+            <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                <h3 class="text-lg font-bold text-gray-900">Mis Reservas</h3>
+            </div>
+            <div class="flex-1">
+                {% if bookings %}
+                    <div class="space-y-4">
+                    {% for booking in bookings %}
+                        <div class="p-4 rounded-xl border border-gray-100 bg-gray-50 hover:bg-blue-50 transition-colors group">
+                            <div class="flex flex-col sm:flex-row justify-between sm:items-start gap-3">
+                                <div>
+                                    <h4 class="text-base font-bold text-brand-blue">{{ booking.resource.name }}</h4>
+                                    <div class="mt-1 flex flex-col text-sm text-gray-500 gap-1">
+                                        <p class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg> Evento: <span class="font-medium text-gray-900">{{ booking.event_date|date:"d/m/Y" }}</span></p>
+                                        <p class="flex items-center gap-2"><svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Creada: {{ booking.event_date|date:"d/m/Y H:i" }} hrs</p>
+                                    </div>
+                                </div>
+                                <a href="{% url 'reservation_detail' booking.pk %}" class="inline-flex justify-center px-4 py-2 text-xs font-semibold text-brand-blue bg-white border border-blue-200 rounded-lg hover:bg-brand-blue hover:text-white transition-colors">Ver detalle</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="flex flex-col items-center justify-center h-32 text-center">
+                        <p class="text-gray-400 italic">No tienes reservas activas</p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
-        <div>
-            <p><a href="{% url 'reservation_create' %}">Reserva tu espacio común</a></p>
-        </div>
-    </div>
 
-    <div>
-        <h3>Reservas del Departamento</h3>
-        <div>
+        <!-- Columna 2: Reservas del Departamento -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-full">
+            <div class="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
+                <h3 class="text-lg font-bold text-gray-900">Reservas del Depto <span class="text-brand-blue">{{ user.resident_profile.department }}</span></h3>
+                <a href="{% url 'reservation_list' %}" class="text-sm font-semibold text-brand-emerald hover:underline">Ver todas &rarr;</a>
+            </div>
+            <div class="flex-1">
             {% if all_bookings %}
-                <ul>
+                <div class="space-y-4">
                 {% for booking in all_bookings %}
                 {% if booking.user.resident_profile.department == user.resident_profile.department %}
-                    <li>
-                        Usuario: <strong>{{ booking.user.first_name }} {{ booking.user.last_name }}</strong>
-                        - Departamento: <strong>{{ booking.user.resident_profile.department }}</strong>  
-                        - Espacio común reservado: <strong>{{ booking.resource.name }}</strong>  
-                        - Fecha del evento: <strong>{{ booking.event_date|date:"d/m/Y" }}</strong>
-                        - </strong> <a href="{% url 'reservation_detail' booking.pk %}">Ver detalle</a>
-                    </li>
+                    <div class="p-4 rounded-xl border border-gray-100 bg-white hover:border-gray-300 transition-colors">
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+                            <div>
+                                <h4 class="text-sm font-bold text-gray-900">{{ booking.resource.name }}</h4>
+                                <div class="mt-1 text-sm text-gray-500">
+                                    <p>Por: <span class="font-medium text-gray-700">{{ booking.user.first_name }} {{ booking.user.last_name }}</span></p>
+                                    <p>Fecha: <span class="font-medium text-brand-blue">{{ booking.event_date|date:"d/m/Y" }}</span></p>
+                                </div>
+                            </div>
+                            <a href="{% url 'reservation_detail' booking.pk %}" class="inline-flex justify-center px-3 py-1.5 text-xs font-semibold text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">Detalle</a>
+                        </div>
+                    </div>
                 {% endif %}
                 {% endfor %}
-                </ul>
+                </div>
             {% else %}
-                <p> Ninguna por ahora </p>
+                <div class="flex flex-col items-center justify-center h-32 text-center">
+                    <p class="text-gray-400 italic">No hay reservas para este departamento</p>
+                </div>
             {% endif %}
+            </div>
         </div>
+
     </div>
 
-    <div>
-        <h3>Todas las Reservas</h3>
-
-        <p><a href="{% url 'reservation_list' %}">Todas las reservas</a></p>
+    <!-- Sección de Espacios Comunes -->
+    <div class="mt-8">
+        <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-gray-900">Espacios Comunes Disponibles <span class="text-sm font-normal text-gray-500 ml-2">({{ zones.count }} en total)</span></h3>
+        </div>
         
+        {% if zones %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for zone in zones %}
+                <div class="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-blue-200 transition-all relative overflow-hidden group">
+                    <!-- Cinta decorativa -->
+                    <div class="absolute top-0 left-0 w-1 h-full bg-brand-blue scale-y-0 group-hover:scale-y-100 transition-transform origin-bottom"></div>
+                    
+                    <div class="flex items-start justify-between mb-3">
+                        <h4 class="text-lg font-bold text-gray-900 pr-2">{{ zone.name }}</h4>
+                        <span class="bg-emerald-50 text-brand-emerald text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-100 flex items-center gap-1 shrink-0">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path></svg>
+                            {{ zone.capacity }}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-600 line-clamp-3 leading-relaxed">{{ zone.description }}</p>
+                </div>
+            {% endfor %}
+            </div>
+        {% else %}
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
+                <p class="text-gray-500 italic">No hay espacios comunes registrados en la comunidad.</p>
+            </div>
+        {% endif %}
     </div>
-
-    <div>
-        <h3>Espacios Comunes</h3>
-        <p>La comunidad dispone de {{ zones.count }} espacios comunes:</p>
-        <div>
-            {% if zones %}
-                <ul>
-                {% for zone in zones %}
-                    <li><strong>Zona:</strong> {{ zone.name }} 
-                    - <strong>Descripción:</strong> {{ zone.description }} 
-                    - <strong>Capacidad:</strong> {{ zone.capacity }} personas</li>
-                {% endfor %}
-                </ul>
-            {% else %}
-                <p> Ninguno por ahora </p>
-            {% endif %}
-        </div>
-    </div>
+</div>
 
     <!-- <script>
         const searchInput = document.getElementById('deptSearch');
