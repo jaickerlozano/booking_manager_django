@@ -1,37 +1,62 @@
 {% extends "general/layout.html" %}
 
-{% block head_title %}Reservation List{% endblock %}
+{% block head_title %}Directorio de Reservas | Booking Manager{% endblock %}
 
 {% block content %}
-    <h2>Lista de Reservas</h2>
-    <label for="deptSearch">Buscar</label>
-    <input type="text" id="deptSearch" placeholder="Filtrar por departamento o espacio común..." 
-    style="margin-bottom: 15px; padding: 5px; width: 100%;">
-
-    <div id="all-bookings-container">
-        {# Incluimos el template parcial que contiene la lista de reservas #}
-        {% include '_includes/_booking_list_partial.html' %}
+<div class="space-y-6">
+    <!-- Cabecera y Botón de Volver -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h2 class="text-2xl font-bold text-gray-900">Directorio de Reservas</h2>
+        <a href="{% if user.administrator_profile %}{% url 'dashboard_admin' %}{% else %}{% url 'profile' %}{% endif %}" class="inline-flex items-center text-sm font-medium text-gray-600 hover:text-brand-blue bg-white border border-gray-200 rounded-lg px-4 py-2 hover:bg-gray-50 transition-colors shadow-sm">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Volver al Panel
+        </a>
     </div>
 
-    <div>
-        <h3>Departamentos con más reservas:</h3>
-        <ul>
-            {% for item in ranking_departamentos %}
-                <li>Departamento {{ item.departamento }}: {{ item.total_reservas }} reservas</li>
-            {% empty %}
-                <li>Aún no hay reservas registradas.</li>
-            {% endfor %}
-        </ul>
+    <!-- Ranking de Departamentos (Tarjetas de Estadísticas) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {% for item in ranking_departamentos %}
+        <div class="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow">
+            <div class="w-12 h-12 rounded-full {% if forloop.counter == 1 %}bg-yellow-100 text-yellow-600{% elif forloop.counter == 2 %}bg-gray-100 text-gray-500{% else %}bg-orange-100 text-orange-600{% endif %} flex items-center justify-center font-bold text-lg border-2 border-white shadow-sm">
+                #{{ forloop.counter }}
+            </div>
+            <div>
+                <p class="text-sm text-gray-500 font-medium">Dpto. <span class="font-bold text-gray-900">{{ item.departamento }}</span></p>
+                <p class="text-2xl font-extrabold text-brand-blue">{{ item.total_reservas }} <span class="text-xs font-normal text-gray-500 uppercase tracking-wide">reservas</span></p>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-1 md:col-span-3 bg-white border border-gray-100 rounded-2xl p-6 text-center shadow-sm">
+            <p class="text-gray-500 italic">Aún no hay estadísticas de reservas registradas.</p>
+        </div>
+        {% endfor %}
     </div>
-    
 
-    {% if user.administrator_profile %}
-        <a href="{% url 'dashboard_admin' %}">Volver al dashboard</a>
-    {% else %}
-        <a href="{% url 'profile' %}">Volver al perfil</a>
-    {% endif %}
+    <!-- Contenedor Principal de la Lista -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        
+        <!-- Buscador / Filtro -->
+        <div class="p-4 border-b border-gray-100 bg-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="relative w-full md:w-1/2 lg:w-1/3">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <svg class="w-5 h-5 text-gray-400" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
+                </div>
+                <input type="text" id="deptSearch" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand-blue focus:border-brand-blue block w-full pl-10 p-2.5 shadow-sm" placeholder="Buscar por Dpto, nombre o espacio...">
+            </div>
+            <div class="text-sm text-gray-500 italic hidden md:block">
+                Búsqueda en tiempo real
+            </div>
+        </div>
 
+        <!-- Lista de Reservas (Parcial) -->
+        <div id="all-bookings-container" class="p-0">
+            {# Incluimos el template parcial que contiene la lista de reservas #}
+            {% include '_includes/_booking_list_partial.html' %}
+        </div>
+    </div>
+</div>
 
+<!-- Script de Búsqueda AJAX -->
     <script>
         const searchInput = document.getElementById('deptSearch');
         const container = document.getElementById('all-bookings-container');

@@ -1,15 +1,39 @@
 {% if bookings %}
-<ul>
-    {% for booking in bookings %}
-        <li>
-            Departamento {{ booking.user.resident_profile.department }} -
-            {{ booking.resource.name }} -
-            <a href="{% url 'reservation_detail' booking.pk %}">{{ booking.event_date|date:"d/m/Y"}}</a>
-        </li>
-    {% empty %}
-        <li>No hay reservas disponibles.</li>
-    {% endfor %}
-</ul> 
+<div class="overflow-x-auto">
+    <table class="w-full text-sm text-left text-gray-500">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-100">
+            <tr>
+                <th scope="col" class="px-6 py-4">Residente</th>
+                <th scope="col" class="px-6 py-4">Espacio Común</th>
+                <th scope="col" class="px-6 py-4">Fecha del Evento</th>
+                <th scope="col" class="px-6 py-4 text-right">Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+            <tr class="bg-white border-b border-gray-50 hover:bg-blue-50/50 transition-colors">
+                <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap flex flex-col">
+                    <span>{{ booking.user.first_name }} {{ booking.user.last_name }}</span>
+                    <span class="text-xs text-gray-500 font-normal">Dpto: {{ booking.user.resident_profile.department }}</span>
+                </td>
+                <td class="px-6 py-4">
+                    <span class="bg-blue-100 text-brand-blue text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap">{{ booking.resource.name }}</span>
+                </td>
+                <td class="px-6 py-4 font-medium text-gray-700 whitespace-nowrap">
+                    {{ booking.event_date|date:"d/m/Y H:i" }}
+                </td>
+                <td class="px-6 py-4 text-right">
+                    <a href="{% url 'reservation_detail' booking.pk %}" class="font-medium text-brand-blue hover:text-blue-800 hover:underline">Ver detalle</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% else %}
-    <li>No hay reservas disponibles.</li>
+<div class="flex flex-col items-center justify-center p-12 text-center bg-white">
+    <svg class="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+    <p class="text-gray-500 font-medium text-lg">No se encontraron reservas.</p>
+    <p class="text-sm text-gray-400 mt-1">Intenta buscar con otra palabra clave.</p>
+</div>
 {% endif %}
