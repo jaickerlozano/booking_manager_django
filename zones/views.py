@@ -119,7 +119,8 @@ class BookingListView(ListView):
         if query:
             queryset = queryset.filter(
                 Q(user__resident_profile__department__icontains=query) |
-                Q(resource__name__icontains=query)
+                Q(resource__name__icontains=query) |
+                Q(user__first_name__icontains=query)
             )
         return queryset
 
