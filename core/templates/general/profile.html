@@ -9,12 +9,16 @@
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8 flex flex-col md:flex-row items-center md:items-start gap-6">
         <div class="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center text-brand-blue flex-shrink-0 border-4 border-white shadow-md">
             <!-- Icono de usuario genérico -->
-            <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+            {% if user.resident_profile.profile_picture %}
+                <img src="{{ user.resident_profile.profile_picture.url }}" alt="Foto de perfil de {{ user.first_name }}" class="w-full h-full object-cover rounded-full border-2 border-gray-200">
+            {% else %}
+                <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+            {% endif %}
         </div>
         <div class="flex-1 text-center md:text-left w-full">
             <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-900">Hola, {{ user.first_name }}</h2>
+                    <h2 class="text-2xl font-bold text-gray-900">Hola, {{ user.first_name }} {{user.pk}} </h2>
                     <p class="text-gray-500 text-lg mt-1">Departamento <span class="font-semibold text-brand-blue">{{ user.resident_profile.department }}</span></p>
                     <div class="mt-4 flex flex-wrap justify-center md:justify-start gap-3">
                         <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gray-50 border border-gray-200 text-sm text-gray-600 font-medium">
@@ -27,8 +31,12 @@
                         </span>
                     </div>
                 </div>
-                <div class="flex-shrink-0 mt-4 md:mt-0">
-                    <a href="{% url 'reservation_create' %}" class="inline-flex items-center justify-center px-5 py-3 text-sm font-semibold text-white bg-brand-emerald hover:bg-emerald-600 rounded-xl shadow-sm focus:ring-4 focus:ring-emerald-200 transition-colors w-full">
+                <div class="flex-shrink-0 mt-4 md:mt-0 flex flex-col sm:flex-row gap-3">
+                    <a href="{% url 'resident_update' user.resident_profile.pk %}" class="inline-flex items-center justify-center px-5 py-3 text-sm font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-xl shadow-sm focus:ring-4 focus:ring-gray-100 transition-colors w-full sm:w-auto">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                        Editar perfil
+                    </a>
+                    <a href="{% url 'reservation_create' %}" class="inline-flex items-center justify-center px-5 py-3 text-sm font-semibold text-white bg-brand-emerald hover:bg-emerald-600 rounded-xl shadow-sm focus:ring-4 focus:ring-emerald-200 transition-colors w-full sm:w-auto">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                         Reservar espacio
                     </a>

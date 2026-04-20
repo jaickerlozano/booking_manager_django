@@ -1,0 +1,42 @@
+{% extends "general/layout.html" %}
+
+{% block head_title %}Actualizar Perfil | Booking Manager{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">Actualizar Perfil</h2>
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700">Nombre</label>
+                {{ form.first_name }}
+                {{ form.first_name.errors }}
+            </div>
+            <div>
+                <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700">Apellido</label>
+                {{ form.last_name }}
+                {{ form.last_name.errors }}
+            </div>
+            <div>
+                <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+                {{ form.email }}
+                {{ form.email.errors }}
+            </div>
+            <div class="md:col-span-2">
+                <label for="{{ form.profile_picture.id_for_label }}" class="block text-sm font-medium text-gray-700">Foto de Perfil</label>
+                {{ form.profile_picture }}
+                {{ form.profile_picture.errors }}
+            </div>
+        </div>
+        <div class="flex items-center justify-end gap-4">
+            <a href="{% url 'profile' %}" class="text-sm font-semibold text-gray-500 hover:text-gray-700 transition-colors">Cancelar</a>
+            <button type ="submit" class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-semibold text-white bg-brand-blue hover:bg-blue-600 rounded-xl shadow-sm focus:ring-4 focus:ring-blue-200 transition-colors">
+                Guardar Cambios
+            </button>
+        </div>
+    </form>
+</div>
+
+{% endblock content %}

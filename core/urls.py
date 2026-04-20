@@ -17,7 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.urls import include
+from django.conf import settings
+from django.conf.urls.static import static
 from .views import HomeView, LoginView, RegisterView, LegalView, ContactView, logout_view, ProfileView, DashboardAdminView
+from users.views import ResidentUpdateView
 from zones.views import AdminBookingCreateView, BookingCreateView, BookingDetailView, BookingUpdateView, BookingDeleteView, ZoneCreateView, ZoneUpdateView, ZoneDeleteView, ZoneListView, BookingListView
 
 urlpatterns = [
@@ -30,6 +33,7 @@ urlpatterns = [
     path('contact/', ContactView.as_view(), name='contact'),
     path('legal/', LegalView.as_view(), name='legal'),
     path('profile/', ProfileView.as_view(), name='profile'), 
+    path('profile/update/<int:pk>/', ResidentUpdateView.as_view(), name='resident_update'),
     path('reservations/create/', BookingCreateView.as_view(), name='reservation_create'),
     path('reservations/admin-create/', AdminBookingCreateView.as_view(), name='admin_reservation_create'),
     path('reservations/detail/<int:pk>', BookingDetailView.as_view(), name='reservation_detail'),
@@ -42,3 +46,6 @@ urlpatterns = [
     path('zones/', ZoneListView.as_view(), name='zone_list'),
     path("__reload__/", include("django_browser_reload.urls")),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
