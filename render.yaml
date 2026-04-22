@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: booking-manager-django
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn booking_manager.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.1
+      - key: DJANGO_SETTINGS_MODULE
+        value: booking_manager.settings
