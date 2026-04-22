@@ -8,6 +8,7 @@ class Zone(models.Model):
     description = models.TextField(blank=True)
     capacity = models.PositiveIntegerField(verbose_name='Capacidad máxima')
     is_available = models.BooleanField(default=True, verbose_name='Disponible')
+    zone_picture = models.ImageField(upload_to='zone_pictures/', blank=True, null=True)
 
     class Meta:
         verbose_name = 'Espacio común'

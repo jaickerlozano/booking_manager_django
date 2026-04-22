@@ -13,7 +13,7 @@
                 <p class="text-sm text-gray-500 mt-2">Registra una nueva área o zona para que los residentes puedan reservarla.</p>
             </div>
             
-            <form class="space-y-4 md:space-y-6" method="POST">
+            <form class="space-y-4 md:space-y-6" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 
                 {% if form.non_field_errors %}

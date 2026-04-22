@@ -21,7 +21,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from .views import HomeView, LoginView, RegisterView, LegalView, ContactView, logout_view, ProfileView, DashboardAdminView
 from users.views import ResidentUpdateView
-from zones.views import AdminBookingCreateView, BookingCreateView, BookingDetailView, BookingUpdateView, BookingDeleteView, ZoneCreateView, ZoneUpdateView, ZoneDeleteView, ZoneListView, BookingListView
+from zones.views import AdminBookingCreateView, BookingCreateView, BookingDetailView, BookingUpdateView, BookingDeleteView, ZoneCreateView, ZoneUpdateView, ZoneDeleteView, BookingListView, ZoneDetailView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -36,14 +36,14 @@ urlpatterns = [
     path('profile/update/<int:pk>/', ResidentUpdateView.as_view(), name='resident_update'),
     path('reservations/create/', BookingCreateView.as_view(), name='reservation_create'),
     path('reservations/admin-create/', AdminBookingCreateView.as_view(), name='admin_reservation_create'),
-    path('reservations/detail/<int:pk>', BookingDetailView.as_view(), name='reservation_detail'),
+    path('reservations/detail/<int:pk>/', BookingDetailView.as_view(), name='reservation_detail'),
     path('reservations/list/', BookingListView.as_view(), name='reservation_list'),
-    path('reservations/update/<int:pk>', BookingUpdateView.as_view(), name='reservation_update'),
-    path('reservations/delete/<int:pk>', BookingDeleteView.as_view(), name='reservation_delete'),
+    path('reservations/update/<int:pk>/', BookingUpdateView.as_view(), name='reservation_update'),
+    path('reservations/delete/<int:pk>/', BookingDeleteView.as_view(), name='reservation_delete'),
     path('zones/create/', ZoneCreateView.as_view(), name='zone_create'),
-    path('zones/update/<int:pk>', ZoneUpdateView.as_view(), name='zone_update'),
-    path('zones/delete/<int:pk>', ZoneDeleteView.as_view(), name='zone_delete'),
-    path('zones/', ZoneListView.as_view(), name='zone_list'),
+    path('zones/detail/<int:pk>/', ZoneDetailView.as_view(), name='zone_detail'),
+    path('zones/update/<int:pk>/', ZoneUpdateView.as_view(), name='zone_update'),
+    path('zones/delete/<int:pk>/', ZoneDeleteView.as_view(), name='zone_delete'),
     path("__reload__/", include("django_browser_reload.urls")),
 ]
 

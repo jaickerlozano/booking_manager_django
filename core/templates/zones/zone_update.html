@@ -13,7 +13,7 @@
                 <p class="text-sm text-gray-500 mt-2">Modifica los detalles del área o zona seleccionada.</p>
             </div>
             
-            <form class="space-y-4 md:space-y-6" method="POST">
+            <form class="space-y-4 md:space-y-6" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 
                 {% if form.non_field_errors %}

@@ -27,10 +27,30 @@ class ReservationModelFormCreate(ModelForm):
                 'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand-blue focus:border-brand-blue block w-full p-2.5'
             })
 
-class ZoneCreateModelForm(ModelForm):
+class ZoneForm(ModelForm):
     class Meta:
         model = Zone
-        fields = ['name', 'description', 'capacity']
+        fields = ['name', 'description', 'capacity', 'zone_picture', 'is_available']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['is_available'].label = "Habilitado"
+        # Agregamos las clases de Tailwind y Flowbite a los inputs
+        for field_name, field in self.fields.items():
+            # El campo de imagen es diferente
+            if field_name == 'zone_picture':
+                 field.widget.attrs.update({
+                    'class': 'block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none'
+                })
+            # El campo de checkbox es diferente
+            elif field_name == 'is_available':
+                field.widget.attrs.update({
+                    'class': 'w-4 h-4 text-brand-blue bg-gray-100 border-gray-300 rounded focus:ring-brand-blue'
+                })
+            else:
+                field.widget.attrs.update({
+                    'class': 'bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-brand-blue focus:border-brand-blue block w-full p-2.5'
+                })
 
 
 class AdminReservationModelFormCreate(ModelForm):

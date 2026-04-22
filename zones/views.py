@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .forms import ReservationModelFormCreate, ZoneCreateModelForm, AdminReservationModelFormCreate
+from .forms import ReservationModelFormCreate, ZoneForm, AdminReservationModelFormCreate
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView, DetailView
 from django.urls import reverse_lazy
@@ -222,7 +222,7 @@ class BookingDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 class ZoneCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Zone
-    form_class = ZoneCreateModelForm
+    form_class = ZoneForm
     template_name = 'zones/zone_create.html'
     success_url = reverse_lazy('dashboard_admin')
 
@@ -239,15 +239,20 @@ class ZoneCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return super().form_valid(form)
 
 
-class ZoneListView(ListView):
+class ZoneDetailView(DetailView):
     model = Zone
-    template_name = 'zones/zone_list.html'
-    context_object_name = 'zones'   
+    template_name = 'zones/zone_detail.html'
+    context_object_name = 'zone'   
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_admin'] = hasattr(self.request.user, 'administrator_profile')
+        return context
 
 
 class ZoneUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Zone
-    fields = ['name', 'description']
+    form_class = ZoneForm
     template_name = 'zones/zone_update.html'
     success_url = reverse_lazy('dashboard_admin')
 
