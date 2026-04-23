@@ -44,7 +44,7 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
             message_content,
             "jlozano.devcode@gmail.com",
             [email],
-            fail_silently=False,
+            fail_silently=True,
         )
 
         messages.success(self.request, "¡Reserva creada exitosamente!")

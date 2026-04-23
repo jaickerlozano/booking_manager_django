@@ -70,7 +70,7 @@ class RegisterView(CreateView):
             message_content,
             "jlozano.devcode@gmail.com",
             [email],
-            fail_silently=False,
+            fail_silently=True,
         )
 
         messages.success(self.request, "¡Registro exitoso! Ahora puedes iniciar sesión.")
@@ -94,7 +94,7 @@ class ContactView(FormView):
             message_content,
             "jlozano.devcode@gmail.com",
             ["jaickerlozano@outlook.com"],
-            fail_silently=False,
+            fail_silently=True,
         )
         messages.success(self.request, "¡Su mensaje ha sido enviado exitosamente! Nos contactaremos con usted a la brevedad.")
 
