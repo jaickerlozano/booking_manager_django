@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'cloudinary_storage',
+    'cloudinary',
     'django_extensions',
     'tailwind',
     'theme',
@@ -156,6 +158,19 @@ EMAIL_HOST_USER = os.environ.get("SECRET_EMAIL", "django-insecure-default-key-pa
 EMAIL_HOST_PASSWORD = os.environ.get("SECRET_KEY_EMAIL", "django-insecure-default-key-para-desarrollo")
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
+
+# Configuración de Cloudinary para almacenamiento de archivos media en producción
+import cloudinary
+
+cloudinary.config(
+    cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.environ.get("CLOUDINARY_API_KEY"),
+    api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
+)
+
+# Usar Cloudinary para almacenar archivos media en producción
+if not DEBUG:
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Constante para Tailwind
 TAILWIND_APP_NAME = "theme"
