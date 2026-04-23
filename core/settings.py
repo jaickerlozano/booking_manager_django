@@ -1,8 +1,11 @@
 import os
+import logging
 import dj_database_url
 from pathlib import Path
 from dotenv import load_dotenv
 import cloudinary
+
+logger = logging.getLogger(__name__)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -36,10 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-
-    'cloudinary_storage',
-    'cloudinary',
     'django.contrib.staticfiles',
+
+    'cloudinary',
+    'cloudinary_storage',
     'django_extensions',
     'tailwind',
     'theme',
@@ -161,30 +164,20 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 
 # Configuración de Cloudinary para almacenamiento de archivos media en producción
-# Cloudinary lee automáticamente la variable CLOUDINARY_URL
-# Formato: cloudinary://api_key:api_secret@cloud_name
-# Se puede configurar también manualmente si es necesario
+# Cloudinary lee automáticamente CLOUDINARY_URL del entorno
+# Formato esperado: cloudinary://api_key:api_secret@cloud_name
 
-import logging
-logger = logging.getLogger(__name__)
+try:
+    cloudinary.config()
+    logger.info("Cloudinary configurado automáticamente")
+except Exception as e:
+    logger.warning(f"No se pudo configurar Cloudinary: {e}")
 
-# Intenta configurar Cloudinary con variables individuales (para desarrollo)
-if os.environ.get("CLOUDINARY_CLOUD_NAME"):
-    try:
-        cloudinary.config(
-            cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
-            api_key=os.environ.get("CLOUDINARY_API_KEY"),
-            api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
-        )
-        logger.info("✅ Cloudinary configurado con variables individuales")
-    except Exception as e:
-        logger.error(f"❌ Error al configurar Cloudinary: {e}")
-
-# Usar Cloudinary para almacenar archivos media en producción
+# Usar Cloudinary para almacenar archivos media solo en producción
 if not DEBUG:
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 else:
-    # En desarrollo, usar el filesystem local
+    # En desarrollo, usar almacenamiento local
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 # Constante para Tailwind
