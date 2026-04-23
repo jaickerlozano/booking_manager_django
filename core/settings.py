@@ -170,6 +170,9 @@ cloudinary.config(
 # Usar Cloudinary para almacenar archivos media en producción
 if not DEBUG:
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+else:
+    # En desarrollo, usar el filesystem local
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 # Constante para Tailwind
 TAILWIND_APP_NAME = "theme"

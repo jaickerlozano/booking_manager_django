@@ -8,5 +8,8 @@ pip install -r requirements.txt
 python manage.py tailwind install
 python manage.py tailwind build
 
-python manage.py collectstatic --no-input
+# Recolectar archivos estáticos (con más tolerancia a errores)
+python manage.py collectstatic --no-input --clear --ignore=media --ignore=.gitignore
+
+# Ejecutar migraciones
 python manage.py migrate
