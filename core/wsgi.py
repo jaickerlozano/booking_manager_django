@@ -17,10 +17,11 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 # Obtiene la aplicación WSGI estándar de Django
 application = get_wsgi_application()
 
-# Envuelve la aplicación con WhiteNoise, pero sin configuraciones iniciales.
+# Envuelve la aplicación con WhiteNoise para servir archivos estáticos y media
 application = WhiteNoise(application)
 
-# Añadimos la regla para que sirva los archivos de STATIC_ROOT en la URL STATIC_URL.
+# Configurar WhiteNoise para servir archivos estáticos en la URL STATIC_URL
 application.add_files(settings.STATIC_ROOT, prefix=settings.STATIC_URL)
-# Añadimos la regla para servir los archivos de medios desde MEDIA_ROOT en la URL MEDIA_URL.
+
+# Configurar WhiteNoise para servir archivos media en la URL MEDIA_URL
 application.add_files(settings.MEDIA_ROOT, prefix=settings.MEDIA_URL)
