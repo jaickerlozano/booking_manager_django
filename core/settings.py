@@ -36,10 +36,10 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
 
     'cloudinary_storage',
     'cloudinary',
+    'django.contrib.staticfiles',
     'django_extensions',
     'tailwind',
     'theme',
@@ -161,11 +161,24 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 
 # Configuración de Cloudinary para almacenamiento de archivos media en producción
-cloudinary.config(
-    cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
-    api_key=os.environ.get("CLOUDINARY_API_KEY"),
-    api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
-)
+# Cloudinary lee automáticamente la variable CLOUDINARY_URL
+# Formato: cloudinary://api_key:api_secret@cloud_name
+# Se puede configurar también manualmente si es necesario
+
+import logging
+logger = logging.getLogger(__name__)
+
+# Intenta configurar Cloudinary con variables individuales (para desarrollo)
+if os.environ.get("CLOUDINARY_CLOUD_NAME"):
+    try:
+        cloudinary.config(
+            cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
+            api_key=os.environ.get("CLOUDINARY_API_KEY"),
+            api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
+        )
+        logger.info("✅ Cloudinary configurado con variables individuales")
+    except Exception as e:
+        logger.error(f"❌ Error al configurar Cloudinary: {e}")
 
 # Usar Cloudinary para almacenar archivos media en producción
 if not DEBUG:
