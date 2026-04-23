@@ -19,7 +19,8 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-default-key-para-desarrollo")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Busca el valor en el entorno, si no existe (en la PC), por defecto es True
+DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
 
 if not os.environ.get("SECRET_KEY") and not DEBUG:
     raise ValueError("¡La SECRET_KEY no está configurada en las variables de entorno!")
@@ -126,6 +127,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # URL base que se usará en el navegador (ej: /media/profile_pictures/foto.jpg)
 MEDIA_URL = '/media/'
