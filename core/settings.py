@@ -2,6 +2,7 @@ import os
 import dj_database_url
 from pathlib import Path
 from dotenv import load_dotenv
+import cloudinary
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -160,8 +161,6 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 
 # Configuración de Cloudinary para almacenamiento de archivos media en producción
-import cloudinary
-
 cloudinary.config(
     cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
     api_key=os.environ.get("CLOUDINARY_API_KEY"),
