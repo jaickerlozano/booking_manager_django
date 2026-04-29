@@ -161,6 +161,7 @@ EMAIL_HOST_USER = os.environ.get("SECRET_EMAIL", "django-insecure-default-key-pa
 EMAIL_HOST_PASSWORD = os.environ.get("SECRET_KEY_EMAIL", "django-insecure-default-key-para-desarrollo")
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
+EMAIL_TIMEOUT = 5  # Segundos. Evita que el worker de Gunicorn haga timeout (30s) si el servidor SMTP no responde
 
 # Configuración de Cloudinary para almacenamiento de archivos media en producción
 # Cloudinary lee automáticamente CLOUDINARY_URL del entorno
