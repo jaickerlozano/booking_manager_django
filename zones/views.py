@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .forms import ReservationModelFormCreate, ZoneForm, AdminReservationModelFormCreate
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, View
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -10,6 +10,8 @@ from users.models import Resident
 from datetime import datetime
 from django.db.models import Count, F, Q
 from django.core.mail import send_mail
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 
 # Create your views here.
 class BookingCreateView(LoginRequiredMixin, CreateView):
@@ -289,3 +291,34 @@ class ZoneDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         zone.delete() # Forma estándar de eliminar la instancia
         messages.success(self.request, f"¡Espacio común eliminado exitosamente! {zone_id}")
         return redirect(self.success_url)
+
+
+class ZoneAvailabilityView(View):
+    """API View que retorna disponibilidad de una zona en formato JSON"""
+    
+    def get(self, request, zone_id):
+        try:
+            zone = Zone.objects.get(pk=zone_id)
+            year = int(request.GET.get('year', datetime.now().year))
+            month = int(request.GET.get('month', datetime.now().month))
+            
+            # Validar que el mes y año sean válidos
+            if month < 1 or month > 12:
+                return JsonResponse({'success': False, 'error': 'Mes inválido'}, status=400)
+            
+            availability = zone.get_availability_for_month(year, month)
+            
+            return JsonResponse({
+                'success': True,
+                'zone': zone.name,
+                'zone_id': zone.pk,
+                'booked_dates': availability['booked_dates'],
+                'year': year,
+                'month': month
+            })
+        except Zone.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Zona no encontrada'}, status=404)
+        except ValueError:
+            return JsonResponse({'success': False, 'error': 'Parámetros inválidos'}, status=400)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)

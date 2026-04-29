@@ -21,7 +21,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from .views import HomeView, LoginView, RegisterView, LegalView, ContactView, logout_view, ProfileView, DashboardAdminView
 from users.views import ResidentUpdateView
-from zones.views import AdminBookingCreateView, BookingCreateView, BookingDetailView, BookingUpdateView, BookingDeleteView, ZoneCreateView, ZoneUpdateView, ZoneDeleteView, BookingListView, ZoneDetailView
+from zones.views import AdminBookingCreateView, BookingCreateView, BookingDetailView, BookingUpdateView, BookingDeleteView, ZoneCreateView, ZoneUpdateView, ZoneDeleteView, BookingListView, ZoneDetailView, ZoneAvailabilityView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -42,6 +42,7 @@ urlpatterns = [
     path('reservations/delete/<int:pk>/', BookingDeleteView.as_view(), name='reservation_delete'),
     path('zones/create/', ZoneCreateView.as_view(), name='zone_create'),
     path('zones/detail/<int:pk>/', ZoneDetailView.as_view(), name='zone_detail'),
+    path('zones/api/availability/<int:zone_id>/', ZoneAvailabilityView.as_view(), name='zone_availability_api'),
     path('zones/update/<int:pk>/', ZoneUpdateView.as_view(), name='zone_update'),
     path('zones/delete/<int:pk>/', ZoneDeleteView.as_view(), name='zone_delete'),
     path("__reload__/", include("django_browser_reload.urls")),
