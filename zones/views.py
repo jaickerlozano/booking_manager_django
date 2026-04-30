@@ -90,7 +90,7 @@ class AdminBookingCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView
             message_content,
             "jlozano.devcode@gmail.com",
             [email],
-            fail_silently=False,
+            fail_silently=True,
         )
 
         messages.success(self.request, f"¡Reserva creada exitosamente para {resident_user.get_full_name()}!")
@@ -180,7 +180,7 @@ class BookingUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             message_content,
             "jlozano.devcode@gmail.com",
             [email],
-            fail_silently=False,
+            fail_silently=True,
         )
 
         messages.success(self.request, "¡Reserva actualizada exitosamente!") # Mensaje del template
@@ -216,7 +216,7 @@ class BookingDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             message_content,
             "jlozano.devcode@gmail.com",
             [email],
-            fail_silently=False,
+            fail_silently=True,
         )
         messages.success(self.request, f"¡Reserva eliminada exitosamente!")
         return redirect(self.success_url)

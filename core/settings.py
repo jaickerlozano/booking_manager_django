@@ -132,7 +132,6 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # URL base que se usará en el navegador (ej: /media/profile_pictures/foto.jpg)
 MEDIA_URL = '/media/'
@@ -162,6 +161,7 @@ EMAIL_HOST_USER = os.environ.get("SECRET_EMAIL", "django-insecure-default-key-pa
 EMAIL_HOST_PASSWORD = os.environ.get("SECRET_KEY_EMAIL", "django-insecure-default-key-para-desarrollo")
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
+EMAIL_TIMEOUT = 5  # Segundos. Evita que el worker de Gunicorn haga timeout (30s) si el servidor SMTP no responde
 
 # Configuración de Cloudinary para almacenamiento de archivos media en producción
 # Cloudinary lee automáticamente CLOUDINARY_URL del entorno
@@ -173,12 +173,26 @@ try:
 except Exception as e:
     logger.warning(f"No se pudo configurar Cloudinary: {e}")
 
-# Usar Cloudinary para almacenar archivos media solo en producción
-if not DEBUG:
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# STORAGES: API correcta desde Django 5.1+ / 6.x
+# DEFAULT_FILE_STORAGE y STATICFILES_STORAGE están deprecadas y son ignoradas
+if DEBUG:
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
 else:
-    # En desarrollo, usar almacenamiento local
-    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    STORAGES = {
+        "default": {
+            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        },
+    }
 
 # Constante para Tailwind
 TAILWIND_APP_NAME = "theme"
