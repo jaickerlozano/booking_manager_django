@@ -25,7 +25,7 @@ class Zone(models.Model):
         if month == 12:
             last_day = date(year + 1, 1, 1) - timedelta(days=1)
         else:
-            last_day = date(year, month + 1, 1) - timedelta(days=1)
+            last_day = date(year, month + 1, 2) - timedelta(days=1)
         
         # Obtener todas las reservas del mes
         bookings = self.bookings.filter(
