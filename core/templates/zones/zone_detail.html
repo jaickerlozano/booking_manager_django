@@ -58,7 +58,14 @@
 
         <!-- Calendario de Disponibilidad -->
         {% include "_includes/_calendar.html" %}
- 
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar el calendario con la zona actual
+    initializeCalendar({{ zone.pk }});
+});
+</script>
+
         <!-- Acciones (Footer) -->
         <div class="p-6 border-t border-gray-100 bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-4">
             <a href="{% if is_admin %}{% url 'dashboard_admin' %}{% else %}{% url 'profile' %}{% endif %}" class="inline-flex items-center text-sm font-medium text-gray-600 hover:text-brand-blue bg-white border border-gray-200 rounded-lg px-5 py-2.5 hover:bg-gray-50 transition-colors shadow-sm w-full sm:w-auto justify-center">

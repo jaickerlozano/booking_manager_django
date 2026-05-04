@@ -38,6 +38,11 @@
                     {% endfor %}
                 </div>
 
+                <!-- Aquí va el calendario -->
+                <div id="calendar-wrapper" style="display: none;">
+                    {% include "_includes/_calendar.html" %}
+                </div>
+
                 <div class="pt-4 flex flex-col sm:flex-row gap-3">
                     <button type="submit" class="w-full text-white bg-brand-emerald hover:bg-emerald-600 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center flex items-center justify-center transition-colors">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
@@ -52,4 +57,31 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const resourceSelect = document.getElementById('id_resource');
+    const calendarWrapper = document.getElementById('calendar-wrapper');
+    
+    function updateCalendar() {
+        const selectedZoneId = resourceSelect.value;
+        
+        if (selectedZoneId) {
+            // Mostrar el calendario
+            calendarWrapper.style.display = 'block';
+            // Inicializar/reinicializar el calendario con la zona seleccionada
+            initializeCalendar(selectedZoneId);
+        } else {
+            // Ocultar el calendario si no hay selección
+            calendarWrapper.style.display = 'none';
+        }
+    }
+    
+    // Escuchar cambios en el dropdown
+    resourceSelect.addEventListener('change', updateCalendar);
+    
+    // Llamar una vez al cargar por si hay una zona preseleccionada
+    updateCalendar();
+});
+</script>
 {% endblock content %}
