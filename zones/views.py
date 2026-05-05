@@ -35,21 +35,53 @@ class BookingCreateView(LoginRequiredMixin, CreateView):
             messages.error(self.request, f'El/La {form.instance.resource.name} ya está reservado para la fecha seleccionada. Por favor, elige otro espacio común o fecha.')
             return self.form_invalid(form)
 
-        form.instance.resource.save()  # Guardar el cambio en el recurso
+        # Guardar la reserva padre si es recurrente
+        booking = form.save(commit=False)
+        booking.user = self.request.user
 
+        # Validar conflictos futuros de la recurrencia antes de guardar
+        if booking.is_recurring and booking.recurrence_pattern != 'NONE':
+            conflicts = booking.get_overlapping_recurring_dates()
+            if conflicts:
+                conflict_dates = ", ".join([d.strftime('%d/%m/%Y') for d in conflicts])
+                messages.error(self.request, f'El/La {booking.resource.name} ya está reservado/a en estas fechas de la recurrencia: {conflict_dates}. Ajusta el periodo o elige otro espacio.')
+                return self.form_invalid(form)
+
+        booking.save()
+
+        # Preparar información para la notificación
         nombre = self.request.user.first_name
         email = self.request.user.email
-        message_content = f"¡{nombre}, tu reserva ha sido creada exitosamente! \nEspacio común: {form.instance.resource.name} \nFecha del evento: {str(form.instance.event_date.date())}"
-
-        send_mail(
-            "Notificación de reserva",
-            message_content,
-            "jlozano.devcode@gmail.com",
-            [email],
-            fail_silently=True,
-        )
-
-        messages.success(self.request, "¡Reserva creada exitosamente!")
+        
+        # Generar instancias recurrentes si aplica
+        if booking.is_recurring and booking.recurrence_pattern != 'NONE':
+            instances = booking.generate_recurring_instances()
+            Booking.objects.bulk_create(instances)
+            
+            recurrence_info = f"\n\nEsta es una reserva recurrente ({booking.get_recurrence_pattern_display()}) que finalizará el {booking.recurrence_end_date.strftime('%d/%m/%Y')}.\nSe han generado {len(instances)} instancias automáticas."
+            message_content = f"¡{nombre}, tu reserva recurrente ha sido creada exitosamente! \nEspacio común: {booking.resource.name} \nFecha de inicio: {str(booking.event_date.date())} {recurrence_info}"
+            
+            send_mail(
+                "Notificación de reserva recurrente",
+                message_content,
+                "jlozano.devcode@gmail.com",
+                [email],
+                fail_silently=True,
+            )
+            
+            messages.success(self.request, f"¡Reserva recurrente creada! Se generaron {len(instances)} instancias.")
+        else:
+            message_content = f"¡{nombre}, tu reserva ha sido creada exitosamente! \nEspacio común: {booking.resource.name} \nFecha del evento: {str(booking.event_date.date())}"
+            
+            send_mail(
+                "Notificación de reserva",
+                message_content,
+                "jlozano.devcode@gmail.com",
+                [email],
+                fail_silently=True,
+            )
+            
+            messages.success(self.request, "¡Reserva creada exitosamente!")
 
         return super().form_valid(form)
 
@@ -83,17 +115,50 @@ class AdminBookingCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView
         resident_user = form.cleaned_data['user']
         nombre = resident_user.first_name
         email = resident_user.email
-        message_content = f"¡Hola {nombre}! \nEl administrador ha creado una reserva a tu nombre. \n\nDetalles de la reserva: \nEspacio común: {form.instance.resource.name} \nFecha del evento: {str(form.instance.event_date.date())}"
+        
+        # Guardar la reserva
+        booking = form.save(commit=False)
+        booking.user = resident_user
 
-        send_mail(
-            "Notificación de reserva creada por administrador",
-            message_content,
-            "jlozano.devcode@gmail.com",
-            [email],
-            fail_silently=True,
-        )
+        # Validar conflictos futuros de la recurrencia antes de guardar
+        if booking.is_recurring and booking.recurrence_pattern != 'NONE':
+            conflicts = booking.get_overlapping_recurring_dates()
+            if conflicts:
+                conflict_dates = ", ".join([d.strftime('%d/%m/%Y') for d in conflicts])
+                messages.error(self.request, f'El/La {booking.resource.name} ya está reservado/a en estas fechas de la recurrencia: {conflict_dates}. Ajusta el periodo o elige otro espacio.')
+                return self.form_invalid(form)
 
-        messages.success(self.request, f"¡Reserva creada exitosamente para {resident_user.get_full_name()}!")
+        booking.save()
+
+        # Generar instancias recurrentes si aplica
+        if booking.is_recurring and booking.recurrence_pattern != 'NONE':
+            instances = booking.generate_recurring_instances()
+            Booking.objects.bulk_create(instances)
+            
+            recurrence_info = f"\n\nEsta es una reserva recurrente ({booking.get_recurrence_pattern_display()}) que finalizará el {booking.recurrence_end_date.strftime('%d/%m/%Y')}.\nSe han generado {len(instances)} instancias automáticas."
+            message_content = f"¡Hola {nombre}! \nEl administrador ha creado una reserva recurrente a tu nombre. \n\nDetalles de la reserva: \nEspacio común: {booking.resource.name} \nFecha de inicio: {str(booking.event_date.date())} {recurrence_info}"
+            
+            send_mail(
+                "Notificación de reserva recurrente creada por administrador",
+                message_content,
+                "jlozano.devcode@gmail.com",
+                [email],
+                fail_silently=False,
+            )
+            
+            messages.success(self.request, f"¡Reserva recurrente creada exitosamente para {resident_user.get_full_name()}! Se generaron {len(instances)} instancias.")
+        else:
+            message_content = f"¡Hola {nombre}! \nEl administrador ha creado una reserva a tu nombre. \n\nDetalles de la reserva: \nEspacio común: {booking.resource.name} \nFecha del evento: {str(booking.event_date.date())}"
+            
+            send_mail(
+                "Notificación de reserva creada por administrador",
+                message_content,
+                "jlozano.devcode@gmail.com",
+                [email],
+                fail_silently=False,
+            )
+            
+            messages.success(self.request, f"¡Reserva creada exitosamente para {resident_user.get_full_name()}!")
 
         return super().form_valid(form)
 
@@ -116,7 +181,8 @@ class BookingListView(ListView):
     
     def get_queryset(self):
         # Este método se encarga de obtener el queryset base y aplicar el filtro de búsqueda.
-        queryset = super().get_queryset() # Obtiene todas las reservas inicialmente
+        # Solo retorna reservas que no son instancias de recurrencia (parent_booking__isnull=True)
+        queryset = super().get_queryset().filter(parent_booking__isnull=True)
         query = self.request.GET.get('dept', '')
         if query:
             queryset = queryset.filter(
@@ -133,12 +199,19 @@ class BookingListView(ListView):
 
         # Agrupamos por departamento para obtener la recurrencia de reservas
         context['ranking_departamentos'] = Booking.objects.filter(
-            user__resident_profile__isnull=False
+            user__resident_profile__isnull=False,
+            parent_booking__isnull=True
         ).annotate(
             departamento=F('user__resident_profile__department')
         ).values('departamento').annotate(
             total_reservas=Count('id')
         ).order_by('-total_reservas')[:3]
+
+        # Obtener reservas recurrentes (parent_booking__isnull=True e is_recurring=True)
+        context['recurring_bookings'] = Booking.objects.filter(
+            parent_booking__isnull=True,
+            is_recurring=True
+        ).order_by('event_date')
 
         return context
 
@@ -180,7 +253,7 @@ class BookingUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             message_content,
             "jlozano.devcode@gmail.com",
             [email],
-            fail_silently=True,
+            fail_silently=False,
         )
 
         messages.success(self.request, "¡Reserva actualizada exitosamente!") # Mensaje del template
@@ -216,11 +289,71 @@ class BookingDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             message_content,
             "jlozano.devcode@gmail.com",
             [email],
-            fail_silently=True,
+            fail_silently=False,
         )
         messages.success(self.request, f"¡Reserva eliminada exitosamente!")
         return redirect(self.success_url)
+
+
+class CancelRecurringBookingView(LoginRequiredMixin, UserPassesTestMixin, View):
+    """Vista para cancelar una reserva recurrente y todas sus instancias"""
     
+    def test_func(self):
+        booking = Booking.objects.get(pk=self.kwargs['pk'])
+        # Comprueba si el usuario actual es el dueño o administrador
+        return booking.user.pk == self.request.user.pk or hasattr(self.request.user, 'administrator_profile')
+
+    def handle_no_permission(self):
+        messages.error(self.request, "No tienes permiso para cancelar esta reserva recurrente.")
+        return redirect('reservation_list')
+
+    def post(self, request, pk):
+        try:
+            booking = Booking.objects.get(pk=pk)
+            
+            # Validar que sea una reserva recurrente padre
+            if not booking.is_recurring or booking.parent_booking is not None:
+                messages.error(request, "Esta no es una reserva recurrente válida.")
+                return redirect('reservation_list')
+            
+            # Obtener información antes de eliminar
+            nombre = booking.user.first_name
+            email = booking.user.email
+            resource = booking.resource.name
+            recurrence_pattern = booking.get_recurrence_pattern_display()
+            
+            # Eliminar todas las instancias recurrentes
+            instances_count = booking.recurring_instances.count()
+            booking.recurring_instances.all().delete()
+            
+            # Eliminar la reserva padre
+            booking.delete()
+            
+            # Enviar notificación
+            message_content = (
+                f"¡{nombre}, tu reserva recurrente ha sido cancelada exitosamente!\n\n"
+                f"Detalles:\n"
+                f"Espacio común: {resource}\n"
+                f"Patrón: {recurrence_pattern}\n"
+                f"Instancias eliminadas: {instances_count}"
+            )
+            send_mail(
+                "Notificación: Reserva recurrente cancelada",
+                message_content,
+                "jlozano.devcode@gmail.com",
+                [email],
+                fail_silently=False,
+            )
+            
+            messages.success(request, f"¡Reserva recurrente cancelada! Se eliminaron {instances_count} instancias.")
+            
+        except Booking.DoesNotExist:
+            messages.error(request, "La reserva recurrente no fue encontrada.")
+        except Exception as e:
+            messages.error(request, f"Error al cancelar la reserva: {str(e)}")
+        
+        return redirect('reservation_list')
+
 
 class ZoneCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Zone
@@ -322,3 +455,10 @@ class ZoneAvailabilityView(View):
             return JsonResponse({'success': False, 'error': 'Parámetros inválidos'}, status=400)
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+    def get_recurring_bookings(self):
+        """Obtiene las reservas recurrentes del usuario"""
+        return self.request.user.bookings.filter(
+            is_recurring=True,
+            recurrence_pattern__in=['WEEKLY', 'BIWEEKLY', 'MONTHLY']
+        ).distinct()

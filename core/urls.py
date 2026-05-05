@@ -21,7 +21,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from .views import HomeView, LoginView, RegisterView, LegalView, ContactView, logout_view, ProfileView, DashboardAdminView
 from users.views import ResidentUpdateView
-from zones.views import AdminBookingCreateView, BookingCreateView, BookingDetailView, BookingUpdateView, BookingDeleteView, ZoneCreateView, ZoneUpdateView, ZoneDeleteView, BookingListView, ZoneDetailView, ZoneAvailabilityView
+from zones.views import AdminBookingCreateView, BookingCreateView, BookingDetailView, BookingUpdateView, BookingDeleteView, ZoneCreateView, ZoneUpdateView, ZoneDeleteView, BookingListView, ZoneDetailView, ZoneAvailabilityView, CancelRecurringBookingView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -40,6 +40,7 @@ urlpatterns = [
     path('reservations/list/', BookingListView.as_view(), name='reservation_list'),
     path('reservations/update/<int:pk>/', BookingUpdateView.as_view(), name='reservation_update'),
     path('reservations/delete/<int:pk>/', BookingDeleteView.as_view(), name='reservation_delete'),
+    path('reservations/cancel-recurring/<int:pk>/', CancelRecurringBookingView.as_view(), name='cancel_recurring_booking'),
     path('zones/create/', ZoneCreateView.as_view(), name='zone_create'),
     path('zones/detail/<int:pk>/', ZoneDetailView.as_view(), name='zone_detail'),
     path('zones/api/availability/<int:zone_id>/', ZoneAvailabilityView.as_view(), name='zone_availability_api'),

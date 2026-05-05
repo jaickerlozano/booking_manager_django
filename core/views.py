@@ -14,6 +14,7 @@ from django.contrib.auth.views import LoginView as DjangoLoginView
 from zones.models import Zone, Booking
 from django.db.models import Q
 from django.core.mail import send_mail
+from collections import Counter
 
 
 # Create your views here.
@@ -146,6 +147,7 @@ class ProfileView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         context['zones'] = Zone.objects.all()
         context['bookings'] = self.request.user.bookings.all()
         context['all_bookings'] = all_bookings
+        context['recurring_bookings'] = self.get_recurring_bookings()
 
         return context
 
@@ -156,6 +158,14 @@ class ProfileView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
             # Si es AJAX, solo renderizamos un mini-template con la lista
             return render(request, '_includes/_all_bookings_list.html', context)
         return super().get(request, *args, **kwargs)
+    
+    def get_recurring_bookings(self):
+        """Obtiene las reservas recurrentes (reservas padre) del usuario logueado"""
+        return self.request.user.bookings.filter(
+            is_recurring=True,
+            recurrence_pattern__in=['WEEKLY', 'BIWEEKLY', 'MONTHLY'],
+            parent_booking__isnull=True  # Solo la reserva padre, no las instancias
+        ).distinct()
 
 
 class DashboardAdminView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):

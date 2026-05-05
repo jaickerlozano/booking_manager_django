@@ -26,6 +26,7 @@
 
                 <div class="space-y-4">
                     {% for field in form %}
+                    {% if field.name not in 'is_recurring,recurrence_pattern,recurrence_end_date' %}
                     <div>
                         <label for="{{ field.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900">{{ field.label }}</label>
                         {{ field }}
@@ -35,8 +36,41 @@
                             </p>
                         {% endif %}
                     </div>
+                    {% endif %}
                     {% endfor %}
                 </div>
+
+                <!-- Campo de recurrencia (visible) -->
+                <div>
+                    <label for="{{ form.is_recurring.id_for_label }}" class="flex items-center gap-3 cursor-pointer mb-4">
+                        {{ form.is_recurring }}
+                        <span class="text-sm font-medium text-gray-900">Deseo que esta reserva sea recurrente</span>
+                    </label>
+                </div>
+
+                <!-- Campos de recurrencia (ocultos hasta que se active) -->
+                <div id="recurrence-fields" class="space-y-4" style="display: none;">
+                    <div>
+                        <label for="{{ form.recurrence_pattern.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900">{{ form.recurrence_pattern.label }}</label>
+                        {{ form.recurrence_pattern }}
+                        {% if form.recurrence_pattern.errors %}
+                            <p class="mt-2 text-sm text-red-600">{% for error in form.recurrence_pattern.errors %}{{ error }}{% endfor %}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.recurrence_end_date.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900">{{ form.recurrence_end_date.label }}</label>
+                        {{ form.recurrence_end_date }}
+                        {% if form.recurrence_end_date.errors %}
+                            <p class="mt-2 text-sm text-red-600">{% for error in form.recurrence_end_date.errors %}{{ error }}{% endfor %}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                    <!-- Calendario dinámico -->
+                    <div id="calendar-wrapper" style="display: none;">
+                        {% include "_includes/_calendar.html" %}
+                    </div>
                 
                 <div class="pt-4 flex flex-col sm:flex-row gap-3">
                     <button type="submit" class="w-full text-white bg-brand-emerald hover:bg-emerald-600 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center flex items-center justify-center transition-colors">
@@ -52,4 +86,37 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const resourceSelect = document.getElementById('id_resource');
+    const calendarWrapper = document.getElementById('calendar-wrapper');
+    const isRecurringCheckbox = document.getElementById('id_is_recurring');
+    const recurrenceFields = document.getElementById('recurrence-fields');
+
+    function updateCalendar() {
+        const selectedZoneId = resourceSelect.value;
+        if (selectedZoneId) {
+            calendarWrapper.style.display = 'block';
+            initializeCalendar(selectedZoneId);
+        } else {
+            calendarWrapper.style.display = 'none';
+        }
+    }
+
+    function toggleRecurrenceFields() {
+        if (isRecurringCheckbox.checked) {
+            recurrenceFields.style.display = 'block';
+        } else {
+            recurrenceFields.style.display = 'none';
+        }
+    }
+
+    resourceSelect.addEventListener('change', updateCalendar);
+    isRecurringCheckbox.addEventListener('change', toggleRecurrenceFields);
+    updateCalendar();
+    toggleRecurrenceFields();
+});
+</script>
 {% endblock content %}
+</script>

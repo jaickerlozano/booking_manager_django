@@ -32,8 +32,18 @@
         {% endfor %}
     </div>
 
-    <!-- Contenedor Principal de la Lista -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <!-- Pestañas de Navegación -->
+    <div class="flex gap-2 mb-4">
+        <button class="tab-btn active px-4 py-2 rounded-lg font-medium text-sm transition-colors bg-brand-blue text-white" data-tab="regular-bookings">
+            Reservas Normales
+        </button>
+        <button class="tab-btn px-4 py-2 rounded-lg font-medium text-sm transition-colors bg-gray-100 text-gray-700 hover:bg-gray-200" data-tab="recurring-bookings">
+            Reservas Recurrentes {% if recurring_bookings.count %}<span class="ml-2 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">{{ recurring_bookings.count }}</span>{% endif %}
+        </button>
+    </div>
+
+    <!-- Contenedor Principal de Reservas Normales -->
+    <div id="regular-bookings" class="tab-content block bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         
         <!-- Buscador / Filtro -->
         <div class="p-4 border-b border-gray-100 bg-gray-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -54,29 +64,116 @@
             {% include '_includes/_booking_list_partial.html' %}
         </div>
     </div>
+
+    <!-- Contenedor de Reservas Recurrentes -->
+    <div id="recurring-bookings" class="tab-content hidden bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        {% if recurring_bookings %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left text-gray-500">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-100">
+                    <tr>
+                        <th scope="col" class="px-6 py-4">Residente</th>
+                        <th scope="col" class="px-6 py-4">Espacio Común</th>
+                        <th scope="col" class="px-6 py-4">Patrón</th>
+                        <th scope="col" class="px-6 py-4">Inicio</th>
+                        <th scope="col" class="px-6 py-4">Fin</th>
+                        <th scope="col" class="px-6 py-4 text-right">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in recurring_bookings %}
+                    <tr class="bg-white border-b border-gray-50 hover:bg-blue-50/50 transition-colors">
+                        <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap flex flex-col">
+                            <span>{{ booking.user.first_name }} {{ booking.user.last_name }}</span>
+                            <span class="text-xs text-gray-500 font-normal">Dpto: {{ booking.user.resident_profile.department }}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="bg-purple-100 text-purple-700 text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap">{{ booking.resource.name }}</span>
+                        </td>
+                        <td class="px-6 py-4 font-medium text-gray-700">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
+                                {{ booking.get_recurrence_pattern_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 font-medium text-gray-700 whitespace-nowrap">
+                            {{ booking.event_date|date:"d/m/Y" }}
+                        </td>
+                        <td class="px-6 py-4 font-medium text-gray-700 whitespace-nowrap">
+                            {{ booking.recurrence_end_date|date:"d/m/Y" }}
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <a href="{% url 'reservation_detail' booking.pk %}" class="font-medium text-brand-blue hover:text-blue-800 hover:underline text-xs">Ver</a>
+                                <form method="POST" action="{% url 'cancel_recurring_booking' booking.pk %}" style="display: inline;" onsubmit="return confirm('¿Deseas cancelar esta reserva recurrente y todas sus instancias?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="font-medium text-red-600 hover:text-red-800 hover:underline text-xs">Cancelar</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="flex flex-col items-center justify-center p-12 text-center bg-white">
+            <svg class="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <p class="text-gray-500 font-medium text-lg">No hay reservas recurrentes registradas.</p>
+            <p class="text-sm text-gray-400 mt-1">Las reservas recurrentes aparecerán aquí cuando se creen.</p>
+        </div>
+        {% endif %}
+    </div>
 </div>
 
-<!-- Script de Búsqueda AJAX -->
-    <script>
-        const searchInput = document.getElementById('deptSearch');
-        const container = document.getElementById('all-bookings-container');
+<!-- Script de Búsqueda AJAX y Gestión de Pestañas -->
+<script>
+    // Script de Búsqueda AJAX
+    const searchInput = document.getElementById('deptSearch');
+    const container = document.getElementById('all-bookings-container');
 
-        let timeout = null;
+    let timeout = null;
 
-        searchInput.addEventListener('input', (e) => {
-            clearTimeout(timeout); // Limpiamos el timer anterior
-            const query = e.target.value;
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(timeout);
+        const query = e.target.value;
 
-            // Esperamos 300ms antes de disparar la búsqueda
-            timeout = setTimeout(() => {
-                fetch(`?dept=${query}`, {
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                })
-                .then(response => response.text())
-                .then(data => {
-                    container.innerHTML = data;
-                });
-            }, 300); 
+        timeout = setTimeout(() => {
+            fetch(`?dept=${query}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(response => response.text())
+            .then(data => {
+                container.innerHTML = data;
+            });
+        }, 300); 
+    });
+
+    // Script de Gestión de Pestañas
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tabName = this.getAttribute('data-tab');
+
+            // Remover estilos activos
+            tabBtns.forEach(b => {
+                b.classList.remove('bg-brand-blue', 'text-white');
+                b.classList.add('bg-gray-100', 'text-gray-700');
+            });
+
+            // Ocultar todos los tabs
+            tabContents.forEach(content => {
+                content.classList.add('hidden');
+                content.classList.remove('block');
+            });
+
+            // Activar tab seleccionado
+            this.classList.add('bg-brand-blue', 'text-white');
+            this.classList.remove('bg-gray-100', 'text-gray-700');
+            document.getElementById(tabName).classList.remove('hidden');
+            document.getElementById(tabName).classList.add('block');
         });
-    </script>
+    });
+</script>
 {% endblock content %}

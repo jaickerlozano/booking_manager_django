@@ -26,21 +26,50 @@
 
                 <div class="space-y-4">
                     {% for field in form %}
-                    <div>
-                        <label for="{{ field.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.errors %}
-                            <p class="mt-2 text-sm text-red-600">
-                                {% for error in field.errors %}{{ error }}{% endfor %}
-                            </p>
+                        {% if field.name != 'is_recurring' and field.name != 'recurrence_pattern' and field.name != 'recurrence_end_date' %}
+                        <div>
+                            <label for="{{ field.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <p class="mt-2 text-sm text-red-600">
+                                    {% for error in field.errors %}{{ error }}{% endfor %}
+                                </p>
+                            {% endif %}
+                        </div>
                         {% endif %}
-                    </div>
                     {% endfor %}
                 </div>
 
                 <!-- Aquí va el calendario -->
                 <div id="calendar-wrapper" style="display: none;">
                     {% include "_includes/_calendar.html" %}
+                </div>
+
+                <!-- Campo de recurrencia (visible) -->
+                <div>
+                    <label for="{{ form.is_recurring.id_for_label }}" class="flex items-center gap-3 cursor-pointer mb-4">
+                        {{ form.is_recurring }}
+                        <span class="text-sm font-medium text-gray-900">Deseo que esta reserva sea recurrente</span>
+                    </label>
+                </div>
+
+                <!-- Campos de recurrencia (ocultos hasta que se active) -->
+                <div id="recurrence-fields" class="space-y-4" style="display: none;">
+                    <div>
+                        <label for="{{ form.recurrence_pattern.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900">{{ form.recurrence_pattern.label }}</label>
+                        {{ form.recurrence_pattern }}
+                        {% if form.recurrence_pattern.errors %}
+                            <p class="mt-2 text-sm text-red-600">{% for error in form.recurrence_pattern.errors %}{{ error }}{% endfor %}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.recurrence_end_date.id_for_label }}" class="block mb-2 text-sm font-medium text-gray-900">{{ form.recurrence_end_date.label }}</label>
+                        {{ form.recurrence_end_date }}
+                        {% if form.recurrence_end_date.errors %}
+                            <p class="mt-2 text-sm text-red-600">{% for error in form.recurrence_end_date.errors %}{{ error }}{% endfor %}</p>
+                        {% endif %}
+                    </div>
                 </div>
 
                 <div class="pt-4 flex flex-col sm:flex-row gap-3">
@@ -62,6 +91,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     const resourceSelect = document.getElementById('id_resource');
     const calendarWrapper = document.getElementById('calendar-wrapper');
+    const isRecurringCheckbox = document.getElementById('id_is_recurring');
+    const recurrenceFields = document.getElementById('recurrence-fields');
     
     function updateCalendar() {
         const selectedZoneId = resourceSelect.value;
@@ -77,11 +108,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Escuchar cambios en el dropdown
+    function toggleRecurrenceFields() {
+        if (isRecurringCheckbox.checked) {
+            recurrenceFields.style.display = 'block';
+        } else {
+            recurrenceFields.style.display = 'none';
+        }
+    }
+    
+    // Escuchar cambios en el dropdown de zona
     resourceSelect.addEventListener('change', updateCalendar);
     
-    // Llamar una vez al cargar por si hay una zona preseleccionada
+    // Escuchar cambios en el checkbox de recurrencia
+    isRecurringCheckbox.addEventListener('change', toggleRecurrenceFields);
+    
+    // Ejecutar al cargar por si hay valores preseleccionados
     updateCalendar();
+    toggleRecurrenceFields();
 });
 </script>
 {% endblock content %}
