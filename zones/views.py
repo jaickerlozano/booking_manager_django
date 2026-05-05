@@ -143,7 +143,7 @@ class AdminBookingCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView
                 message_content,
                 "jlozano.devcode@gmail.com",
                 [email],
-                fail_silently=False,
+                fail_silently=True,
             )
             
             messages.success(self.request, f"¡Reserva recurrente creada exitosamente para {resident_user.get_full_name()}! Se generaron {len(instances)} instancias.")
@@ -155,7 +155,7 @@ class AdminBookingCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView
                 message_content,
                 "jlozano.devcode@gmail.com",
                 [email],
-                fail_silently=False,
+                fail_silently=True,
             )
             
             messages.success(self.request, f"¡Reserva creada exitosamente para {resident_user.get_full_name()}!")
@@ -236,7 +236,7 @@ class BookingUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def test_func(self):
         # Comprueba si el usuario actual es el dueño de la reserva a actualizar o si tiene perfil de administrador
-        return self.get_object().user.pk == self.request.user.pk or self.request.user.administrator_profile
+        return self.get_object().user.pk == self.request.user.pk or hasattr(self.request.user, 'administrator_profile')
 
     def handle_no_permission(self):
         # Qué hacer si test_func devuelve False (cuando no es el dueño)
@@ -253,7 +253,7 @@ class BookingUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             message_content,
             "jlozano.devcode@gmail.com",
             [email],
-            fail_silently=False,
+            fail_silently=True,
         )
 
         messages.success(self.request, "¡Reserva actualizada exitosamente!") # Mensaje del template
@@ -268,7 +268,7 @@ class BookingDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def test_func(self):
         # Comprueba si el usuario actual es el dueño de la reserva a eliminar o si tiene perfil de adminstrador
-        return self.get_object().user.pk == self.request.user.pk or self.request.user.administrator_profile
+        return self.get_object().user.pk == self.request.user.pk or hasattr(self.request.user, 'administrator_profile')
 
     def handle_no_permission(self):
         messages.error(self.request, "No tienes permiso para eliminar esta reserva.")
@@ -289,7 +289,7 @@ class BookingDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             message_content,
             "jlozano.devcode@gmail.com",
             [email],
-            fail_silently=False,
+            fail_silently=True,
         )
         messages.success(self.request, f"¡Reserva eliminada exitosamente!")
         return redirect(self.success_url)
@@ -342,7 +342,7 @@ class CancelRecurringBookingView(LoginRequiredMixin, UserPassesTestMixin, View):
                 message_content,
                 "jlozano.devcode@gmail.com",
                 [email],
-                fail_silently=False,
+                fail_silently=True,
             )
             
             messages.success(request, f"¡Reserva recurrente cancelada! Se eliminaron {instances_count} instancias.")
